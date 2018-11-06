@@ -17,7 +17,29 @@ int main(int argc, char *argv[]) {
     int ** map;
     char path0[100] = "Maps/Map_1.txt";
     create(&map, path0);
-    printf("%d", map[4][2]);
+    //printf("%d", map[4][2]);
+    char color[10] = "Blue";
+    char pathx[100];
+    for (int i = 0; i<5; i++)
+    {
+
+        int tile = map[i][0];
+        int x = map[i][1];
+        int y = map[i][2];
+
+        char temp[20];
+
+        sprintf(temp, "tile%s_%02d",color, tile);
+
+        sprintf(pathx, "Resources/Abstract Platformer/Assets/PNG/Tiles/");
+        strcat(pathx, color);
+        strcat(pathx, " tiles/");
+        strcat(pathx, temp);
+        strcat(pathx, ".png");
+
+
+
+    }
 
 
 
@@ -31,6 +53,7 @@ int main(int argc, char *argv[]) {
     Keprenyo def_screen = {1536, 864, (double)16/(double)9};
     double scale = (double)prog_screen.szelesseg / (double) def_screen.szelesseg;
 
+
     // Ezek csak proba rajzok.
 
 
@@ -41,15 +64,31 @@ int main(int argc, char *argv[]) {
     const char path3[200] = "Resources/Abstract Platformer/Assets/PNG/Tiles/Blue tiles/tileBlue_05.png";
     const char path4[200] = "Resources/Abstract Platformer/Assets/PNG/Tiles/Blue tiles/tileBlue_06.png";
 
-    SDL_Rect destination = {0, 0, 64, 50};
+    SDL_Rect dest;
+    char x[200];
+    for (int i = 0; i<5; i++)
+    {
+        int tile = map[i][0];
+        int x = map[i][1];
+        int y = map[i][2];
+
+        dest.x = x;
+        dest.y = y;
+
+        calculate_path(&x, color, tile);
+
+        rajzol(&path4, &dest, scale);
+    }
+
+    SDL_Rect destination1 = {0, 0, 64, 50};
     SDL_Rect destination2 = {1472, 0, 64, 50};
     SDL_Rect destination3 = {0, 814, 64, 50};
     SDL_Rect destination4 = {def_screen.szelesseg-64, def_screen.magassag-50, 64, 50};
     SDL_Rect destination5 = {128, 128, 64, 64};
     SDL_Rect destination6 = {192, 128, 64, 64};
     SDL_Rect destination7 = {256, 128, 64, 64};
-
-    rajzol(&path, &destination, scale);
+/*
+    rajzol(&path, &destination1, scale);
     rajzol(&path, &destination2, scale);
     rajzol(&path, &destination3, scale);
     rajzol(&path, &destination4, scale);
@@ -57,7 +96,7 @@ int main(int argc, char *argv[]) {
     rajzol(&path3, &destination6, scale);
     rajzol(&path4, &destination7, scale);
 
-
+*/
 
     SDL_RenderPresent(renderer);
 

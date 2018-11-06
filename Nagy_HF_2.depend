@@ -370,3 +370,41 @@
 	<stdio.h>
 	<stdlib.h>
 
+1541465589 source:c:\users\abord\documents\programing\c projects\nagy_hf_2\nagy_hf_2\main.c
+	<SDL2/SDL.h>
+	<SDL2/SDL2_gfxPrimitives.h>
+	<SDL_image.h>
+	<math.h>
+	<stdlib.h>
+	<stdio.h>
+	<windows.h>
+	<stdbool.h>
+	"screen.h"
+	"map_load.h"
+	"map_draw.h"
+
+1541456118 c:\users\abord\documents\programing\c projects\nagy_hf_2\nagy_hf_2\screen.h
+
+1541456493 c:\users\abord\documents\programing\c projects\nagy_hf_2\nagy_hf_2\map_load.h
+
+1541465095 c:\users\abord\documents\programing\c projects\nagy_hf_2\nagy_hf_2\map_draw.h
+
+1541465095 source:c:\users\abord\documents\programing\c projects\nagy_hf_2\nagy_hf_2\map_draw.c
+	<SDL2/SDL.h>
+	<SDL2/SDL2_gfxPrimitives.h>
+	<SDL_image.h>
+	<string.h>
+
+1541456492 source:c:\users\abord\documents\programing\c projects\nagy_hf_2\nagy_hf_2\map_load.c
+	<stdio.h>
+	<stdlib.h>
+
+1541456118 source:c:\users\abord\documents\programing\c projects\nagy_hf_2\nagy_hf_2\screen.c
+	<SDL2/SDL.h>
+	<SDL2/SDL2_gfxPrimitives.h>
+	<SDL_image.h>
+	<stdlib.h>
+	<stdio.h>
+	<windows.h>
+	"screen.h"
+
