@@ -16,11 +16,11 @@ int main(int argc, char *argv[]) {
 
     int ** map;
     char path0[100] = "Maps/Map_1.txt";
+    char color[10] = "Blue";
     create(&map, path0);
     //printf("%d", map[4][2]);
-    char color[10] = "Blue";
     char pathx[100];
-    for (int i = 0; i<5; i++)
+  /*  for (int i = 0; i<5; i++)
     {
 
         int tile = map[i][0];
@@ -40,7 +40,7 @@ int main(int argc, char *argv[]) {
 
 
     }
-
+*/
 
 
 
@@ -75,9 +75,11 @@ int main(int argc, char *argv[]) {
         dest.x = x;
         dest.y = y;
 
-        calculate_path(&x, color, tile);
 
-        rajzol(&path4, &dest, scale);
+        calculate_path(&x, color, tile);
+        //printf("%s",x);
+
+        rajzol(&x, &dest, scale);
     }
 
     SDL_Rect destination1 = {0, 0, 64, 50};
