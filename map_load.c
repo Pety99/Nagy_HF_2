@@ -1,18 +1,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "map_load.h"
+
 void beolvas(FILE ** fp, char* path)
 {
     *fp = fopen(path, "rt");
     if (*fp == NULL)
     {
-        perror("Nem siker¸lt megnyitni a filet");
+        perror("Nem siker√ºlt megnyitni a filet");
         return;
     }
 }
 int sorok_szama(char * path)
 {
-    // FONTOS!!! Lennie kell mÈg egy enternek a file vÈgÈn.
+    // FONTOS!!! Lennie kell m√©g egy enternek a file v√©g√©n.
     char c;
     int sorok = 0;
     FILE* fp = fopen(path, "r");
@@ -23,7 +25,7 @@ int sorok_szama(char * path)
     }
 
     for (c = getc(fp); c != EOF; c = getc(fp))
-        if (c == '\n') // Nˆveli a c-t ha \n karaktert l·t
+        if (c == '\n') // N√∂veli a c-t ha \n karaktert l√°t
             sorok = sorok + 1;
 
     fclose(fp);
@@ -35,15 +37,15 @@ int foglal(int*** p, int sor, int oszlop)
     int i;
     *p = malloc(sor*sizeof(int *));
     if (p == NULL) {
-        printf("Nem siker¸lt memÛri·t foglalni!\n");
+        printf("Nem siker√ºlt mem√≥ri√°t foglalni!\n");
         return 1;
     }
 
     for(i = 0 ; i < sor ; i++)
         (*p)[i] = malloc( oszlop*sizeof(int) );
         if (p == NULL) {
-        printf("Nem siker¸lt memÛri·t foglalni!\n");
-        return 1;
+            printf("Nem siker√ºlt mem√≥ri√°t foglalni!\n");
+            return 1;
     }
 
 }
@@ -68,7 +70,7 @@ void fill(int** p, char* path)
         free(sor);
 }
 
-//Ezek a lÈnyeges f¸ggvÈny
+//Ezek a l√©nyeges f√ºggv√©ny
 
 void free2D_tomb(int** p, int sor)
 {
@@ -77,7 +79,7 @@ void free2D_tomb(int** p, int sor)
         free(p[i]);
     free(p);
 }
-void create(int***map, char *path)
+void create(int***map, char *path, Map* terkep)
 {
     FILE* palya;
     beolvas(&palya, path);
@@ -85,6 +87,10 @@ void create(int***map, char *path)
     int sor_max = sorok_szama(path);
     int oszlop_max = 3;
 
-    foglal(map,sor_max, 5);
+    foglal(map,sor_max, oszlop_max);
     fill (*map, path);
+    terkep->map = *map;
+    terkep->meret = sor_max;
 }
+
+// sajnos csak k√©s≈ëbb jutott eszembe hogy a m√©retet is el kellene t√°rolni, ez√©rt a strukt√∫r√°t m√°r csak itt haszn√°ltam

@@ -5,7 +5,7 @@
 
 void calculate_path(char* path, char* color,int tile)
 {
-    char temp[20];
+    char temp[25];
         sprintf(temp, "tile%s_%02d",color, tile);
         sprintf(path, "Resources/Abstract Platformer/Assets/PNG/Tiles/");
         strcat(path, color);
@@ -14,9 +14,9 @@ void calculate_path(char* path, char* color,int tile)
         strcat(path, ".png");
 }
 
-void draw_map(int**map, char * color, int scale)
+/*void draw_map(int**map, char * color, int scale) // NINCS HASZNÁLVA
 {
-    char path[100];
+    char path[200];
 
     // AZ INT 5 ÖT KI KELL CSERELNI A HOSSZRA!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
      for (int i = 0; i<5; i++)
@@ -26,8 +26,6 @@ void draw_map(int**map, char * color, int scale)
         int y = map[i][2];
 
         calculate_path(path, color, tile);
-
-
 
 
         //printf("%s\n", path);
@@ -55,8 +53,8 @@ void draw_map(int**map, char * color, int scale)
 
 
 }
-
-void rajzol(char const *path, SDL_Rect * destination, double scale)
+*/
+void rajzol(char const *path, double scale, int x, int y)
 {
     SDL_Renderer *renderer;
     SDL_Surface* surface = IMG_Load(path);
@@ -69,11 +67,14 @@ void rajzol(char const *path, SDL_Rect * destination, double scale)
     int width = surface ->w;
     int height = surface ->h;
     SDL_FreeSurface(surface);
-    destination->h = (int)height * scale +1;
-    destination->w = (int)width * scale +1;
-    destination->x = (int)destination->x* 64 * scale; // a 64 et még javítani kell
-    destination->y = (int)destination->y * 64 * scale;
+    SDL_Rect destination;
+    destination.x = x;
+    destination.y = y;
+    destination.h = (int)height * scale +1;
+    destination.w = (int)width * scale +1;
+    destination.x = (int)destination.x* 64 * scale; // a 64 et még javítani kell csak a nagy képeket rajzolja jól
+    destination.y = (int)destination.y * 64 * scale;
 
-    SDL_RenderCopy(renderer, texture,NULL, destination);
+    SDL_RenderCopy(renderer, texture,NULL, &destination);
     SDL_DestroyTexture(texture);
 }

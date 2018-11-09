@@ -10,105 +10,160 @@
 #include "screen.h"
 #include "map_load.h"
 #include "map_draw.h"
+#include "physics.h"
 
-int main(int argc, char *argv[]) {
+Uint32 idozit(Uint32 ms, void *param)
+{
+    SDL_Event ev;
+    ev.type = SDL_USEREVENT;
+    SDL_PushEvent(&ev);
+    return ms;   /* ujabb varakozas */
+}
+
+int main(int argc, char *argv[])
+{
+
+    int time = 5;
+    enum { ABLAK = 1560 };
+    enum { GOLYO_R=10 };
+
+    typedef struct Golyo
+    {
+        double x, y;
+        double vx, vy;
+    } Golyo;
+
+
 
 
     int ** map;
-    char path0[100] = "Maps/Map_1.txt";
+    Map terkep;
+    Map terkep2;
+    char path[200] = "Maps/Map_1.txt";
     char color[10] = "Blue";
-    create(&map, path0);
-    //printf("%d", map[4][2]);
-    char pathx[100];
-  /*  for (int i = 0; i<5; i++)
-    {
-
-        int tile = map[i][0];
-        int x = map[i][1];
-        int y = map[i][2];
-
-        char temp[20];
-
-        sprintf(temp, "tile%s_%02d",color, tile);
-
-        sprintf(pathx, "Resources/Abstract Platformer/Assets/PNG/Tiles/");
-        strcat(pathx, color);
-        strcat(pathx, " tiles/");
-        strcat(pathx, temp);
-        strcat(pathx, ".png");
-
-
-
-    }
-*/
-
-
+    create(&map, path, &terkep);
 
     SDL_Window *window;
     SDL_Renderer *renderer;
     Keprenyo prog_screen = sdl_init(&window, &renderer); //Szeretnem fuggvenybe tenni, de nem megy.
+    SDL_TimerID id = SDL_AddTimer(time, idozit, NULL);
+
 
     //A rajzolasnal barmilyen ertek kirajzolhato a def_screen es a scale segitsegevel.
 
     Keprenyo def_screen = {1536, 864, (double)16/(double)9};
-    double scale = (double)prog_screen.szelesseg / (double) def_screen.szelesseg;
-
-
-    // Ezek csak proba rajzok.
-
-
-
+    double scale = (double)prog_screen.szelesseg / (double) def_screen.szelesseg; // ez a scale a képernyõtõl függ
     boxRGBA(renderer, 0, 0, def_screen.szelesseg*scale, def_screen.magassag*scale, 0xFF, 0xFF, 0xFF, 0xFF);
-    const char path[200] = "Resources/Abstract Platformer/Assets/PNG/Tiles/Blue tiles/tileBlue_27.png";
-    const char path2[200] = "Resources/Abstract Platformer/Assets/PNG/Tiles/Blue tiles/tileBlue_04.png";
-    const char path3[200] = "Resources/Abstract Platformer/Assets/PNG/Tiles/Blue tiles/tileBlue_05.png";
-    const char path4[200] = "Resources/Abstract Platformer/Assets/PNG/Tiles/Blue tiles/tileBlue_06.png";
 
-    SDL_Rect dest;
-    char x[200];
-    for (int i = 0; i<5; i++)
+    Toltes t;
+    t.q = -6 * scale;
+    t.vx = 0 * scale;
+    t.vy =0 * scale;
+    t.x = 500 * scale;
+    t.y = 500 * scale;
+    t.hatotav = 150 * scale;
+
+    Toltes t2;
+    t2.q = -5 * scale;
+    t2.vx = 0 * scale;
+    t2.vy =0 * scale;
+    t2.x = 1150 * scale;
+    t2.y = 400 * scale;
+    t2.hatotav = 150 * scale;
+
+    filledCircleRGBA(renderer, t.x, t.y, GOLYO_R * scale, 60, 178, 226, 255); // csak a töltés helyére egy kör
+    filledCircleRGBA(renderer, t2.x, t2.y, GOLYO_R * scale, 60, 178, 226, 255); // csak a töltés helyére egy kör
+
+    /* animaciohoz */
+    Toltes p;
+    p.x = 100 *scale;
+    p.y = 580 *scale;
+    p.vx = 3 * scale;
+    p.vy = 0 * scale;
+    p.q = 1; // Teljesen mindegy mekkora ettől nem függ
+
+
+
+    for (int i = 0; i<terkep.meret; i++)
     {
-        int tile = map[i][0];
-        int x = map[i][1];
-        int y = map[i][2];
+        int tile = terkep.map[i][0];
+        int x = terkep.map[i][1];
+        int y = terkep.map[i][2];
+        char file_hely[200];
 
-        dest.x = x;
-        dest.y = y;
-
-
-        calculate_path(&x, color, tile);
-        //printf("%s",x);
-
-        rajzol(&x, &dest, scale);
+        calculate_path(file_hely, color, tile);
+        rajzol(&file_hely, scale, x, y);
     }
 
-    SDL_Rect destination1 = {0, 0, 64, 50};
-    SDL_Rect destination2 = {1472, 0, 64, 50};
-    SDL_Rect destination3 = {0, 814, 64, 50};
-    SDL_Rect destination4 = {def_screen.szelesseg-64, def_screen.magassag-50, 64, 50};
-    SDL_Rect destination5 = {128, 128, 64, 64};
-    SDL_Rect destination6 = {192, 128, 64, 64};
-    SDL_Rect destination7 = {256, 128, 64, 64};
-/*
-    rajzol(&path, &destination1, scale);
-    rajzol(&path, &destination2, scale);
-    rajzol(&path, &destination3, scale);
-    rajzol(&path, &destination4, scale);
-    rajzol(&path2, &destination5, scale);
-    rajzol(&path3, &destination6, scale);
-    rajzol(&path4, &destination7, scale);
-
-*/
-
-    SDL_RenderPresent(renderer);
 
     /* varunk a kilepesre */
     SDL_Event event;
-    while (SDL_WaitEvent(&event) && event.type != SDL_QUIT) {
-        if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE) {
+    int tries = 0;
+    while (SDL_WaitEvent(&event) && event.type != SDL_QUIT)
+    {
+
+        switch (event.type)
+        {
+        /* felhasznaloi esemeny: ilyeneket general az idozito fuggveny */
+        case SDL_USEREVENT:
+            /* kitoroljuk az elozo poziciojabol (nagyjabol) */
+            filledCircleRGBA(renderer, p.x, p.y, GOLYO_R*scale, 0xFF, 0xFF, 0xFF, 0xFF);
+            filledCircleRGBA(renderer, t.x, t.y, GOLYO_R * scale, 60, 178, 226, 255); // csak a töltés helyére egy kör
+            filledCircleRGBA(renderer, t2.x, t2.y, GOLYO_R * scale, 60, 178, 226, 255); // csak a töltés helyére egy kör
+
+            /* kiszamitjuk az uj helyet */
+        if (in_hatotav(p, t, t.hatotav))
+        {
+                calc_dir(p, t, time);
+                //printf("p.x: %f\n", p.x);
+                //printf("p.y: %f\n", p.y);
+                calc_v(&p, &t, time, scale);
+        }
+
+            p.x += p.vx;
+            p.y += p.vy;
+
+        if (in_hatotav(p, t2, t2.hatotav))
+        {
+                //printf("p.x: %f\n", p.x);
+                //printf("p.y: %f\n", p.y);
+                calc_v(&p, &t2, time, scale);
+        }
+
+            p.x += p.vx;            //EZ MIND 2 szer hozzáadódott javítani kell
+            p.y += p.vy;            //!!!!!
+
+
+
+            /* visszapattanás */
+            if (p.x < GOLYO_R*scale || p.x > prog_screen.szelesseg-GOLYO_R*scale)
+            {
+
+                p.vx *= -1;
+               // tries++;
+            }
+            if (p.y < GOLYO_R*scale || p.y > prog_screen.magassag-GOLYO_R*scale)
+                p.vy *= -1;
+            /* ujra kirajzolas, es mehet a kepernyore */
+            filledCircleRGBA(renderer, p.x, p.y, GOLYO_R*scale, 3, 165, 136, 220);
+            SDL_RenderPresent(renderer);
+            if (tries == 3)
+                SDL_Quit();
             break;
+
+
+
+        }
+        if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE)
+        {
+            SDL_RemoveTimer(id);
+            SDL_Quit();
+
+
         }
     }
+
+
 
     /* ablak bezarasa */
 

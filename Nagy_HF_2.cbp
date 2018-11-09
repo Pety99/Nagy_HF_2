@@ -57,6 +57,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="map_load.h" />
+		<Unit filename="physics.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="physics.h" />
 		<Unit filename="screen.c">
 			<Option compilerVar="CC" />
 		</Unit>
