@@ -8,14 +8,12 @@ typedef struct Map
 
 void beolvas(FILE ** fp, char* path);
 int sorok_szama(char * path);
-int foglal(int*** p, int sor, int oszlop);
-int foglal2(Map* p, int sor, int oszlop);
-void fill(int** p, char* path);
-void fill2(Map p, char* path);
+int foglal(Map* p, int sor, int oszlop);
+void fill(Map p, char* path);
 
-void free2D_tomb(int** p, int sor);
 void free_Map(Map p, int sor);
-void create(int***map, char *path, Map *terkep);
-void create2(Map *map, char *path);
+void load_map(Map *map, char *path);
+
+int chose_map (int number_of_maps);
 
 #endif // MAP_LOAD_H_INCLUDED

@@ -32,25 +32,8 @@ int sorok_szama(char * path)
     return sorok;
 
 }
-int foglal(int*** p, int sor, int oszlop)
-{
-    int i;
-    *p = malloc(sor*sizeof(int *));
-    if (p == NULL) {
-        printf("Nem sikerült memóriát foglalni!\n");
-        return 1;
-    }
 
-    for(i = 0 ; i < sor ; i++)
-        (*p)[i] = malloc( oszlop*sizeof(int) );
-        if (p == NULL) {
-            printf("Nem sikerült memóriát foglalni!\n");
-            return 1;
-    }
-
-}
-
-int foglal2(Map* p, int sor, int oszlop)
+int foglal(Map* p, int sor, int oszlop)
 {
     int i;
     p->map = malloc(sor*sizeof(int *));
@@ -68,28 +51,7 @@ int foglal2(Map* p, int sor, int oszlop)
 
 }
 
-void fill(int** p, char* path)
-{
-    FILE* fp;
-    beolvas(&fp, path);
-
-    char * sor = NULL;
-    size_t hossz = 0;
-    ssize_t olvas;
-    int i = 0;
-    while ((olvas = getline(&sor, &hossz, fp)) != -1)
-     {
-        //printf("Retrieved sor of length %zu :\n", olvas);
-        //printf("%s", sor);
-        sscanf(sor, "%d %d %d", &p[i][0], &p[i][1], &p[i][2]);
-        i++;
-    }
-    fclose(fp);
-    if (sor)
-        free(sor);
-}
-
-void fill2(Map p, char* path)
+void fill(Map p, char* path)
 {
     FILE* fp;
     beolvas(&fp, path);
@@ -112,13 +74,6 @@ void fill2(Map p, char* path)
 
 //Ezek a lényeges függvény
 
-void free2D_tomb(int** p, int sor)
-{
-    int i;
-    for(i = 0 ; i < sor ; i++)
-        free(p[i]);
-    free(p);
-}
 
 void free_Map(Map p, int sor)
 {
@@ -128,7 +83,7 @@ void free_Map(Map p, int sor)
     free(p.map);
 }
 
-void create(int***map, char *path, Map* terkep)
+void load_maps(Map *map, char *path)
 {
     FILE* palya;
     beolvas(&palya, path);
@@ -137,22 +92,20 @@ void create(int***map, char *path, Map* terkep)
     int oszlop_max = 3;
 
     foglal(map,sor_max, oszlop_max);
-    fill (*map, path);
-    terkep->map = *map;
-    terkep->meret = sor_max;
-}
-void create2(Map *map, char *path)
-{
-    FILE* palya;
-    beolvas(&palya, path);
-
-    int sor_max = sorok_szama(path);
-    int oszlop_max = 3;
-
-    foglal2(map,sor_max, oszlop_max);
-    fill2(*map, path);
+    fill(*map, path);
     map->meret = sor_max;
 }
 
 
-// sajnos csak később jutott eszembe hogy a méretet is el kellene tárolni, ezért a struktúrát már csak itt használtam
+// ezek más kategória függvényei
+
+int chose_map (int number_of_maps)
+ {
+     int palya = -1;
+    while (palya < 1 || palya > number_of_maps)
+    {
+        printf("Valassz palyat 1 - %d: ", number_of_maps);
+        scanf("%d",&palya);
+    }
+    return palya;
+ }

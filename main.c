@@ -24,34 +24,26 @@ Uint32 idozit(Uint32 ms, void *param)
     return ms;   /* ujabb varakozas */
 }
 
+
 int main(int argc, char *argv[])
 {
-    Map maps[10];
-    /*
-    for (int i = 0; i < 10; i ++)
+    int number_of_maps = 3;                     /// A pályák számát majd át kell állítani annyire amennyi van!
+    int palya = chose_map(number_of_maps);      // Kiválasszuk a pályánk számát.
+
+    Map maps[number_of_maps];
+    char color[10] = "Blue";
+
+    for (int i = 0; i < number_of_maps; i ++)   //Betölti a pályákat
     {
-        char path[200] = "Maps/Map_2.txt";
-        char color[10] = "Blue";
-        create(&maps[i], path, &terkep);
+        char path[200];
+        char temp[30];
+        sprintf(path,  "Maps/Map_%d.txt", i+1);
+        load_maps(&maps[i], path);
     }
-    */
+
     int time = 5;
     enum { GOLYO_R=10 };
 
-
-
-
-    Map terkep;
-    ///int ** map;
-    ///Map terkep;
-
-
-    char path[200] = "Maps/Map_2.txt";
-    char color[10] = "Blue";
-
-
-    create2(&terkep, path);
-    ///create(&map, path, &terkep);
 
     SDL_Window *window;
     SDL_Renderer *renderer;
@@ -93,11 +85,11 @@ int main(int argc, char *argv[])
 
 
 
-    for (int i = 0; i<terkep.meret; i++)
+    for (int i = 0; i<maps[palya-1].meret; i++)
     {
-        int tile = terkep.map[i][0];
-        int x = terkep.map[i][1];
-        int y = terkep.map[i][2];
+        int tile = maps[palya-1].map[i][0];
+        int x = maps[palya-1].map[i][1];
+        int y = maps[palya-1].map[i][2];
         char file_hely[200];
 
         calculate_path(file_hely, color, tile);
