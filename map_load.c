@@ -49,6 +49,25 @@ int foglal(int*** p, int sor, int oszlop)
     }
 
 }
+
+int foglal2(Map* p, int sor, int oszlop)
+{
+    int i;
+    p->map = malloc(sor*sizeof(int *));
+    if (p == NULL) {
+        printf("Nem sikerült memóriát foglalni!\n");
+        return 1;
+    }
+
+    for(i = 0 ; i < sor ; i++)
+        p->map[i] = malloc( oszlop*sizeof(int) );
+        if (p == NULL) {
+            printf("Nem sikerült memóriát foglalni!\n");
+            return 1;
+    }
+
+}
+
 void fill(int** p, char* path)
 {
     FILE* fp;
@@ -70,6 +89,27 @@ void fill(int** p, char* path)
         free(sor);
 }
 
+void fill2(Map p, char* path)
+{
+    FILE* fp;
+    beolvas(&fp, path);
+
+    char * sor = NULL;
+    size_t hossz = 0;
+    ssize_t olvas;
+    int i = 0;
+    while ((olvas = getline(&sor, &hossz, fp)) != -1)
+     {
+        //printf("Retrieved sor of length %zu :\n", olvas);
+        //printf("%s", sor);
+        sscanf(sor, "%d %d %d", &(p.map[i][0]), &(p.map[i][1]), &(p.map[i][2]));
+        i++;
+    }
+    fclose(fp);
+    if (sor)
+        free(sor);
+}
+
 //Ezek a lényeges függvény
 
 void free2D_tomb(int** p, int sor)
@@ -79,6 +119,15 @@ void free2D_tomb(int** p, int sor)
         free(p[i]);
     free(p);
 }
+
+void free_Map(Map p, int sor)
+{
+    int i;
+    for(i = 0 ; i < sor ; i++)
+        free(p.map[i]);
+    free(p.map);
+}
+
 void create(int***map, char *path, Map* terkep)
 {
     FILE* palya;
@@ -92,5 +141,18 @@ void create(int***map, char *path, Map* terkep)
     terkep->map = *map;
     terkep->meret = sor_max;
 }
+void create2(Map *map, char *path)
+{
+    FILE* palya;
+    beolvas(&palya, path);
+
+    int sor_max = sorok_szama(path);
+    int oszlop_max = 3;
+
+    foglal2(map,sor_max, oszlop_max);
+    fill2(*map, path);
+    map->meret = sor_max;
+}
+
 
 // sajnos csak később jutott eszembe hogy a méretet is el kellene tárolni, ezért a struktúrát már csak itt használtam

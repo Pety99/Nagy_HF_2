@@ -12,6 +12,10 @@
 #include "map_draw.h"
 #include "physics.h"
 
+
+
+
+
 Uint32 idozit(Uint32 ms, void *param)
 {
     SDL_Event ev;
@@ -22,32 +26,37 @@ Uint32 idozit(Uint32 ms, void *param)
 
 int main(int argc, char *argv[])
 {
-
+    Map maps[10];
+    /*
+    for (int i = 0; i < 10; i ++)
+    {
+        char path[200] = "Maps/Map_2.txt";
+        char color[10] = "Blue";
+        create(&maps[i], path, &terkep);
+    }
+    */
     int time = 5;
-    enum { ABLAK = 1560 };
     enum { GOLYO_R=10 };
 
-    typedef struct Golyo
-    {
-        double x, y;
-        double vx, vy;
-    } Golyo;
 
 
 
-
-    int ** map;
     Map terkep;
-    Map terkep2;
-    char path[200] = "Maps/Map_1.txt";
+    ///int ** map;
+    ///Map terkep;
+
+
+    char path[200] = "Maps/Map_2.txt";
     char color[10] = "Blue";
-    create(&map, path, &terkep);
+
+
+    create2(&terkep, path);
+    ///create(&map, path, &terkep);
 
     SDL_Window *window;
     SDL_Renderer *renderer;
     Keprenyo prog_screen = sdl_init(&window, &renderer); //Szeretnem fuggvenybe tenni, de nem megy.
     SDL_TimerID id = SDL_AddTimer(time, idozit, NULL);
-
 
     //A rajzolasnal barmilyen ertek kirajzolhato a def_screen es a scale segitsegevel.
 
@@ -127,7 +136,7 @@ int main(int argc, char *argv[])
         {
                 //printf("p.x: %f\n", p.x);
                 //printf("p.y: %f\n", p.y);
-                calc_v(&p, &t2, time, scale);
+            calc_v(&p, &t2, time, scale);
         }
 
             p.x += p.vx;            //EZ MIND 2 szer hozzáadódott javítani kell
