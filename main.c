@@ -12,6 +12,7 @@
 #include "map_draw.h"
 #include "physics.h"
 #include "charge_load.h"
+#include "charge_draw.h"
 
 
 
@@ -32,7 +33,7 @@ int main(int argc, char *argv[])
 
 
     Map maps[number_of_maps];
-    for (int i = 0; i < number_of_maps; i ++)   //Betölti a pályákat
+    for (int i = 0; i < number_of_maps; i ++)           ///Betölti a pályákat
     {
         char path[200];
         sprintf(path,  "Maps/Map_%d.txt", i+1);
@@ -40,10 +41,10 @@ int main(int argc, char *argv[])
     }
 
 
-    Charge c;                                  //Betölti a töltéseket
+    Charge c;                                           ///Betölti a töltéseket
     for ( int i = 0; i < number_of_maps; i++)
     {
-        char* toltes_helye[200];
+        char toltes_helye[200];
         sprintf(toltes_helye, "Maps/Charges/Charge_%d.txt", i+1);
         load_charges(&c, toltes_helye);
     }
@@ -64,15 +65,17 @@ int main(int argc, char *argv[])
     Keprenyo def_screen = {1536, 864, (double)16/(double)9};
     double scale = (double)prog_screen.szelesseg / (double) def_screen.szelesseg; // ez a scale a képernyõtõl függ
     boxRGBA(renderer, 0, 0, def_screen.szelesseg*scale, def_screen.magassag*scale, 0xFF, 0xFF, 0xFF, 0xFF);
-    Toltes t;
-    t.q = -6 * scale;
+
+
+    Toltes t;                   ///Statikus Próbatöltés 1
+    t.q = 6 * scale;
     t.vx = 0 * scale;
     t.vy =0 * scale;
     t.x = 500 * scale;
     t.y = 500 * scale;
     t.hatotav = 150 * scale;
 
-    Toltes t2;
+    Toltes t2;                  /// Statikus Próbatöltés 2
     t2.q = -5 * scale;
     t2.vx = 0 * scale;
     t2.vy =0 * scale;
@@ -80,20 +83,21 @@ int main(int argc, char *argv[])
     t2.y = 400 * scale;
     t2.hatotav = 150 * scale;
 
+
     filledCircleRGBA(renderer, t.x, t.y, GOLYO_R * scale, 60, 178, 226, 255); // csak a töltés helyére egy kör
     filledCircleRGBA(renderer, t2.x, t2.y, GOLYO_R * scale, 60, 178, 226, 255); // csak a töltés helyére egy kör
 
-    // animaciohoz
-    Toltes p;
+
+    Toltes p;                  /// Mozgó Próbatöltés
     p.x = 100 *scale;
     p.y = 580 *scale;
     p.vx = 3 * scale;
     p.vy = 0 * scale;
-    p.q = 1; // Teljesen mindegy mekkora ettől nem függ
+    p.q = 1;                   // Teljesen mindegy mekkora ettől nem függ
 
 
 
-    for (int i = 0; i<maps[palya-1].meret; i++)
+    for (int i = 0; i<maps[palya-1].meret; i++)             ///Páyla kirajzolása
     {
         int tile = maps[palya-1].map[i][0];
         int x = maps[palya-1].map[i][1];
@@ -103,6 +107,19 @@ int main(int argc, char *argv[])
         calculate_path(file_hely, color, tile);
         rajzol(&file_hely, scale, x, y);
     }
+
+    for (int i = 0; i<c.meret; i++)             ///Töltések kirajzolása
+    {
+        int x = c.charge[i].x;
+        int y = c.charge[i].y;
+        char toltes_hely[200];
+        //printf("%f",c.charge[i].q);
+        charge_calculate_path(toltes_hely, c.charge[i].q);
+        charge_rajzol(toltes_hely, scale, c.charge[i].x, c.charge[i].y);
+
+
+    }
+
 
 
     // varunk a kilepesre
@@ -116,10 +133,19 @@ int main(int argc, char *argv[])
         //felhasznaloi esemeny: ilyeneket general az idozito fuggveny
         case SDL_USEREVENT:
             // kitoroljuk az elozo poziciojabol (nagyjabol)
-            filledCircleRGBA(renderer, p.x, p.y, GOLYO_R*scale, 0xFF, 0xFF, 0xFF, 0xFF);
-            filledCircleRGBA(renderer, t.x, t.y, GOLYO_R * scale, 60, 178, 226, 255); // csak a töltés helyére egy kör
-            filledCircleRGBA(renderer, t2.x, t2.y, GOLYO_R * scale, 60, 178, 226, 255); // csak a töltés helyére egy kör
+            //filledCircleRGBA(renderer, p.x, p.y, GOLYO_R*scale, 0xFF, 0xFF, 0xFF, 0xFF);
+            //filledCircleRGBA(renderer, t.x, t.y, GOLYO_R * scale, 60, 178, 226, 255);   // csak a töltés helyére egy kö
+            //filledCircleRGBA(renderer, t2.x, t2.y, GOLYO_R * scale, 60, 178, 226, 255); // csak a töltés helyére egy kör
+            for (int i = 0; i<c.meret; i++)             ///Töltések kirajzolása
+            {
+                int x = c.charge[i].x;
+                int y = c.charge[i].y;
+                char toltes_hely[200];
 
+                charge_calculate_path(toltes_hely, c.charge[i].q);
+                charge_rajzol(toltes_hely, scale, c.charge[i].x, c.charge[i].y);
+
+            }
             // kiszamitjuk az uj helyet
         if (in_hatotav(p, t, t.hatotav))
         {
@@ -155,6 +181,7 @@ int main(int argc, char *argv[])
                 p.vy *= -1;
             // ujra kirajzolas, es mehet a kepernyore
             filledCircleRGBA(renderer, p.x, p.y, GOLYO_R*scale, 3, 165, 136, 220);
+
             SDL_RenderPresent(renderer);
             if (tries == 3)
                 SDL_Quit();

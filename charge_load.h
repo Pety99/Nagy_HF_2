@@ -1,6 +1,7 @@
 #ifndef CHARGE_LOAD_H_INCLUDED
 #define CHARGE_LOAD_H_INCLUDED
-
+#include "physics.h"
+#include <stdbool.h>
 
 
 

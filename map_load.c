@@ -2,6 +2,9 @@
 #include <stdlib.h>
 
 #include "map_load.h"
+#include "map_load.h"
+#include "physics.h"
+#include "charge_load.h"
 
 void beolvas(FILE ** fp, char* path)
 {
