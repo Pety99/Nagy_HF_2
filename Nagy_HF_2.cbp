@@ -46,6 +46,10 @@
 			<Add library="dxguid" />
 			<Add directory="$(#sdl2.lib)" />
 		</Linker>
+		<Unit filename="charge_load.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="charge_load.h" />
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>

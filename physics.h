@@ -3,9 +3,9 @@
 
 typedef struct Toltes
     {
+        double q; // töltés erõssége
         double x, y; // x,y koordináta
         double vx, vy; // x,y irányú sebesség
-        double q; // töltés erõssége
         double hatotav; // csak az állandó töltéseknek van!!
     } Toltes;
 

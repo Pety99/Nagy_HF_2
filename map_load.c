@@ -17,14 +17,10 @@ int sorok_szama(char * path)
     // FONTOS!!! Lennie kell még egy enternek a file végén.
     char c;
     int sorok = 0;
-    FILE* fp = fopen(path, "r");
-    if (fp == NULL)
-    {
-        printf("Nem lehet megnyitni a filet-t: %s", path);
-        return 0;
-    }
+    FILE* fp;
+    beolvas(&fp, path);
 
-    for (c = getc(fp); c != EOF; c = getc(fp))
+    for (c = getc(fp); c != '#'; c = getc(fp))
         if (c == '\n') // Növeli a c-t ha \n karaktert lát
             sorok = sorok + 1;
 
@@ -50,6 +46,8 @@ int foglal(Map* p, int sor, int oszlop)
     }
 
 }
+
+
 
 void fill(Map p, char* path)
 {
@@ -99,7 +97,7 @@ void load_maps(Map *map, char *path)
 
 // ezek más kategória függvényei
 
-int chose_map (int number_of_maps)
+int pick_map (int number_of_maps)
  {
      int palya = -1;
     while (palya < 1 || palya > number_of_maps)
@@ -109,3 +107,14 @@ int chose_map (int number_of_maps)
     }
     return palya;
  }
+
+ char* pick_color()
+{
+    char* colors[4] = {"Blue", "Brown", "Green", "Yellow"};
+
+    char * color;
+    srand(time(NULL));
+    color = colors[rand() % 4];
+
+    return color;
+}

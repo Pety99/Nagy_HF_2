@@ -4,6 +4,7 @@ typedef struct Map
 {
     int ** map;
     int meret;
+    char* color;
 }Map;
 
 void beolvas(FILE ** fp, char* path);
@@ -14,6 +15,7 @@ void fill(Map p, char* path);
 void free_Map(Map p, int sor);
 void load_map(Map *map, char *path);
 
-int chose_map (int number_of_maps);
+int pick_map (int number_of_maps);
+char* pick_color();
 
 #endif // MAP_LOAD_H_INCLUDED

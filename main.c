@@ -11,8 +11,7 @@
 #include "map_load.h"
 #include "map_draw.h"
 #include "physics.h"
-
-
+#include "charge_load.h"
 
 
 
@@ -28,21 +27,31 @@ Uint32 idozit(Uint32 ms, void *param)
 int main(int argc, char *argv[])
 {
     int number_of_maps = 3;                     /// A pályák számát majd át kell állítani annyire amennyi van!
-    int palya = chose_map(number_of_maps);      // Kiválasszuk a pályánk számát.
+    int palya = pick_map(number_of_maps);       // Kiválasszuk a pályánk számát.
+    char * color = pick_color();                // Random színű pálya
+
 
     Map maps[number_of_maps];
-    char color[10] = "Blue";
-
     for (int i = 0; i < number_of_maps; i ++)   //Betölti a pályákat
     {
         char path[200];
-        char temp[30];
         sprintf(path,  "Maps/Map_%d.txt", i+1);
         load_maps(&maps[i], path);
     }
 
+
+    Charge c;                                  //Betölti a töltéseket
+    for ( int i = 0; i < number_of_maps; i++)
+    {
+        char* toltes_helye[200];
+        sprintf(toltes_helye, "Maps/Charges/Charge_%d.txt", i+1);
+        load_charges(&c, toltes_helye);
+    }
+
+
     int time = 5;
     enum { GOLYO_R=10 };
+
 
 
     SDL_Window *window;
@@ -55,7 +64,6 @@ int main(int argc, char *argv[])
     Keprenyo def_screen = {1536, 864, (double)16/(double)9};
     double scale = (double)prog_screen.szelesseg / (double) def_screen.szelesseg; // ez a scale a képernyõtõl függ
     boxRGBA(renderer, 0, 0, def_screen.szelesseg*scale, def_screen.magassag*scale, 0xFF, 0xFF, 0xFF, 0xFF);
-
     Toltes t;
     t.q = -6 * scale;
     t.vx = 0 * scale;
@@ -75,7 +83,7 @@ int main(int argc, char *argv[])
     filledCircleRGBA(renderer, t.x, t.y, GOLYO_R * scale, 60, 178, 226, 255); // csak a töltés helyére egy kör
     filledCircleRGBA(renderer, t2.x, t2.y, GOLYO_R * scale, 60, 178, 226, 255); // csak a töltés helyére egy kör
 
-    /* animaciohoz */
+    // animaciohoz
     Toltes p;
     p.x = 100 *scale;
     p.y = 580 *scale;
@@ -97,7 +105,7 @@ int main(int argc, char *argv[])
     }
 
 
-    /* varunk a kilepesre */
+    // varunk a kilepesre
     SDL_Event event;
     int tries = 0;
     while (SDL_WaitEvent(&event) && event.type != SDL_QUIT)
@@ -105,14 +113,14 @@ int main(int argc, char *argv[])
 
         switch (event.type)
         {
-        /* felhasznaloi esemeny: ilyeneket general az idozito fuggveny */
+        //felhasznaloi esemeny: ilyeneket general az idozito fuggveny
         case SDL_USEREVENT:
-            /* kitoroljuk az elozo poziciojabol (nagyjabol) */
+            // kitoroljuk az elozo poziciojabol (nagyjabol)
             filledCircleRGBA(renderer, p.x, p.y, GOLYO_R*scale, 0xFF, 0xFF, 0xFF, 0xFF);
             filledCircleRGBA(renderer, t.x, t.y, GOLYO_R * scale, 60, 178, 226, 255); // csak a töltés helyére egy kör
             filledCircleRGBA(renderer, t2.x, t2.y, GOLYO_R * scale, 60, 178, 226, 255); // csak a töltés helyére egy kör
 
-            /* kiszamitjuk az uj helyet */
+            // kiszamitjuk az uj helyet
         if (in_hatotav(p, t, t.hatotav))
         {
                 calc_dir(p, t, time);
@@ -136,7 +144,7 @@ int main(int argc, char *argv[])
 
 
 
-            /* visszapattanás */
+            //visszapattanás
             if (p.x < GOLYO_R*scale || p.x > prog_screen.szelesseg-GOLYO_R*scale)
             {
 
@@ -145,7 +153,7 @@ int main(int argc, char *argv[])
             }
             if (p.y < GOLYO_R*scale || p.y > prog_screen.magassag-GOLYO_R*scale)
                 p.vy *= -1;
-            /* ujra kirajzolas, es mehet a kepernyore */
+            // ujra kirajzolas, es mehet a kepernyore
             filledCircleRGBA(renderer, p.x, p.y, GOLYO_R*scale, 3, 165, 136, 220);
             SDL_RenderPresent(renderer);
             if (tries == 3)

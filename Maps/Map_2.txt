@@ -11,3 +11,4 @@
 22 21 2
 23 22 2
 1 23 2
+# Formátum: Kép, Oszlop, Sor
