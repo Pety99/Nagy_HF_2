@@ -370,7 +370,7 @@
 	<stdio.h>
 	<stdlib.h>
 
-1541950895 source:c:\users\abord\documents\programing\c projects\nagy_hf_2\nagy_hf_2\main.c
+1542420154 source:c:\users\abord\documents\programing\c projects\nagy_hf_2\nagy_hf_2\main.c
 	<SDL2/SDL.h>
 	<SDL2/SDL2_gfxPrimitives.h>
 	<SDL_image.h>
@@ -388,25 +388,24 @@
 
 1541535538 c:\users\abord\documents\programing\c projects\nagy_hf_2\nagy_hf_2\screen.h
 
-1541885254 c:\users\abord\documents\programing\c projects\nagy_hf_2\nagy_hf_2\map_load.h
+1542420468 c:\users\abord\documents\programing\c projects\nagy_hf_2\nagy_hf_2\map_load.h
 
-1541534898 c:\users\abord\documents\programing\c projects\nagy_hf_2\nagy_hf_2\map_draw.h
+1542420786 c:\users\abord\documents\programing\c projects\nagy_hf_2\nagy_hf_2\map_draw.h
 
-1541804470 source:c:\users\abord\documents\programing\c projects\nagy_hf_2\nagy_hf_2\map_draw.c
+1542420786 source:c:\users\abord\documents\programing\c projects\nagy_hf_2\nagy_hf_2\map_draw.c
 	<SDL2/SDL.h>
 	<SDL2/SDL2_gfxPrimitives.h>
 	<SDL_image.h>
 	<string.h>
 
-1541931731 source:c:\users\abord\documents\programing\c projects\nagy_hf_2\nagy_hf_2\map_load.c
+1542420459 source:c:\users\abord\documents\programing\c projects\nagy_hf_2\nagy_hf_2\map_load.c
 	<stdio.h>
 	<stdlib.h>
-	"map_load.h"
 	"map_load.h"
 	"physics.h"
 	"charge_load.h"
 
-1541456118 source:c:\users\abord\documents\programing\c projects\nagy_hf_2\nagy_hf_2\screen.c
+1542306245 source:c:\users\abord\documents\programing\c projects\nagy_hf_2\nagy_hf_2\screen.c
 	<SDL2/SDL.h>
 	<SDL2/SDL2_gfxPrimitives.h>
 	<SDL_image.h>
@@ -415,9 +414,10 @@
 	<windows.h>
 	"screen.h"
 
-1541887526 c:\users\abord\documents\programing\c projects\nagy_hf_2\nagy_hf_2\physics.h
+1542410028 c:\users\abord\documents\programing\c projects\nagy_hf_2\nagy_hf_2\physics.h
+	<stdbool.h>
 
-1541804119 source:c:\users\abord\documents\programing\c projects\nagy_hf_2\nagy_hf_2\physics.c
+1542409913 source:c:\users\abord\documents\programing\c projects\nagy_hf_2\nagy_hf_2\physics.c
 	<SDL2/SDL.h>
 	<SDL2/SDL2_gfxPrimitives.h>
 	<SDL_image.h>
@@ -431,11 +431,11 @@
 	"map_draw.h"
 	"physics.h"
 
-1541950862 c:\users\abord\documents\programing\c projects\nagy_hf_2\nagy_hf_2\charge_load.h
+1542305686 c:\users\abord\documents\programing\c projects\nagy_hf_2\nagy_hf_2\charge_load.h
 	"physics.h"
 	<stdbool.h>
 
-1541950862 source:c:\users\abord\documents\programing\c projects\nagy_hf_2\nagy_hf_2\charge_load.c
+1542307340 source:c:\users\abord\documents\programing\c projects\nagy_hf_2\nagy_hf_2\charge_load.c
 	<stdio.h>
 	<stdlib.h>
 	<stdbool.h>
@@ -443,11 +443,28 @@
 	"physics.h"
 	"charge_load.h"
 
-1541948650 source:c:\users\abord\documents\programing\c projects\nagy_hf_2\nagy_hf_2\charge_draw.c
+1542410485 source:c:\users\abord\documents\programing\c projects\nagy_hf_2\nagy_hf_2\charge_draw.c
 	<SDL2/SDL.h>
 	<SDL2/SDL2_gfxPrimitives.h>
 	<SDL_image.h>
 	<string.h>
+	<stdio.h>
 
-1541940495 c:\users\abord\documents\programing\c projects\nagy_hf_2\nagy_hf_2\charge_draw.h
+1542410255 c:\users\abord\documents\programing\c projects\nagy_hf_2\nagy_hf_2\charge_draw.h
+
+1542286318 c:\users\abord\documents\programing\c projects\nagy_hf_2\nagy_hf_2\debugmalloc.h
+	<stdlib.h>
+	<stdbool.h>
+
+1542306470 source:c:\users\abord\documents\programing\c projects\nagy_hf_2\nagy_hf_2\debugmalloc.c
+	<stdbool.h>
+	<stdlib.h>
+	<stdio.h>
+	<ctype.h>
+	<string.h>
+	<time.h>
+	<stdarg.h>
+	"debugmalloc.h"
+
+1542420644 source:c:\users\abord\documents\programing\c projects\nagy_hf_2\nagy_hf_2\draw_functions.c
 

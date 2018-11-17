@@ -1,7 +1,8 @@
+
+
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "map_load.h"
 #include "map_load.h"
 #include "physics.h"
 #include "charge_load.h"
@@ -42,10 +43,14 @@ int foglal(Map* p, int sor, int oszlop)
     }
 
     for(i = 0 ; i < sor ; i++)
+    {
+
         p->map[i] = malloc( oszlop*sizeof(int) );
-        if (p == NULL) {
+        if (p == NULL)
+        {
             printf("Nem sikerült memóriát foglalni!\n");
             return 1;
+        }
     }
 
 }
@@ -69,8 +74,7 @@ void fill(Map p, char* path)
         i++;
     }
     fclose(fp);
-    if (sor)
-        free(sor);
+
 }
 
 //Ezek a lényeges függvény
@@ -116,7 +120,6 @@ int pick_map (int number_of_maps)
     char* colors[4] = {"Blue", "Brown", "Green", "Yellow"};
 
     char * color;
-    srand(time(NULL));
     color = colors[rand() % 4];
 
     return color;

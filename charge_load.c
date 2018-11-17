@@ -1,3 +1,5 @@
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -11,9 +13,11 @@
 
 bool toltes_foglal(Charge * c, int meret) {
     c->meret = meret;
-    c->charge = (Toltes*) malloc(meret * sizeof(Toltes));
-    return c->charge != NULL;
+    c->toltes = (Toltes*) malloc(meret * sizeof(Toltes));
+    return c->toltes != NULL;
 }
+
+
 void toltes_fill(Charge c, char* toltes_helye)
 {
     FILE* fp;
@@ -28,20 +32,23 @@ void toltes_fill(Charge c, char* toltes_helye)
      {
         //printf("Retrieved sor of length %zu :\n", olvas);
         //printf("%s", sor);
-        sscanf(sor, "%lf %lf %lf %lf %lf %lf", &(c.charge[i].q), &(c.charge[i].x), &(c.charge[i].y), &(c.charge[i].vx), &(c.charge[i].vy), &(c.charge[i].hatotav));
+        sscanf(sor, "%lf %lf %lf %lf %lf %lf", &(c.toltes[i].q), &(c.toltes[i].x), &(c.toltes[i].y), &(c.toltes[i].vx), &(c.toltes[i].vy), &(c.toltes[i].hatotav));
         i++;
     }
     fclose(fp);
-    if (sor)
-        free(sor);
 }
-void free_Charge(Charge c, int sor)
+
+
+void free_Charge(Charge *c, int number_of_maps)
 {
-    int i;
-    for(i = 0 ; i < sor ; i++)
-        free(&c.charge[i]);
-    free(c.charge);
+    int j = 0;
+    for (j = 0; j < number_of_maps; j++)
+    {
+        free(c[j].toltes);
+    }
+
 }
+
 
 void load_charges(Charge *c, char *toltes_helye)
 {
@@ -54,3 +61,4 @@ void load_charges(Charge *c, char *toltes_helye)
     toltes_fill(*c, toltes_helye);
     c->meret = sor_max;
 }
+

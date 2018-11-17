@@ -1,7 +1,10 @@
+
+
 #include <SDL2/SDL.h>
 #include <SDL2/SDL2_gfxPrimitives.h>
 #include <SDL_image.h>
 #include <string.h>
+#include <stdio.h>
 
 void charge_calculate_path(char* path, int q)
 {
@@ -30,8 +33,8 @@ void charge_rajzol(char const *path, double scale, int x, int y)
     destination.y = y - height/2;
     destination.h = (int)height * scale ;
     destination.w = (int)width * scale ;
-    destination.x = (int)destination.x * scale;
-    destination.y = (int)destination.y * scale;
+    destination.x = (int)destination.x;
+    destination.y = (int)destination.y;
 
     SDL_RenderCopy(renderer, texture,NULL, &destination);
     SDL_DestroyTexture(texture);

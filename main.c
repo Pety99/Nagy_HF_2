@@ -1,3 +1,5 @@
+
+
 #include <SDL2/SDL.h>
 #include <SDL2/SDL2_gfxPrimitives.h>
 #include <SDL_image.h>
@@ -14,6 +16,11 @@
 #include "charge_load.h"
 #include "charge_draw.h"
 
+typedef struct Palya_screeshot
+{
+    SDL_Rect meret;
+    SDL_Texture *kep;
+}Palya_screeshot;
 
 
 Uint32 idozit(Uint32 ms, void *param)
@@ -25,8 +32,14 @@ Uint32 idozit(Uint32 ms, void *param)
 }
 
 
+void screenshot(Keprenyo prog_screen, Keprenyo def_screen, SDL_Renderer *renderer, SDL_Window* window, double scale)
+{
+
+}
+
 int main(int argc, char *argv[])
 {
+
     int number_of_maps = 3;                     /// A pályák számát majd át kell állítani annyire amennyi van!
     int palya = pick_map(number_of_maps);       // Kiválasszuk a pályánk számát.
     char * color = pick_color();                // Random színű pálya
@@ -40,18 +53,23 @@ int main(int argc, char *argv[])
         load_maps(&maps[i], path);
     }
 
+    Palya_screeshot palya_kep;                          /// majd ez fogja tárolni a pályát
+    palya_kep.meret.x = 0;
+    palya_kep.meret.y = 0;
+    palya_kep.meret.w = GetSystemMetrics(SM_CXSCREEN);
+    palya_kep.meret.h = GetSystemMetrics(SM_CYSCREEN);
 
-    Charge c;                                           ///Betölti a töltéseket
-    for ( int i = 0; i < number_of_maps; i++)
-    {
+    Charge c[number_of_maps];                                           ///Betölti a töltéseket
+    for ( int i = 0; i < number_of_maps; i++)                           ///meghívásnál: c[palya].toltes[töltés szám].tulajdonság ( a palya egy int)
+    {                                                                   ///pl: c[1].toltes[2].hatotav
         char toltes_helye[200];
         sprintf(toltes_helye, "Maps/Charges/Charge_%d.txt", i+1);
-        load_charges(&c, toltes_helye);
+        load_charges(&c[i], toltes_helye);
     }
-
 
     int time = 5;
     enum { GOLYO_R=10 };
+    printf("%f",c[2].toltes[2].hatotav);
 
 
 
@@ -67,34 +85,10 @@ int main(int argc, char *argv[])
     boxRGBA(renderer, 0, 0, def_screen.szelesseg*scale, def_screen.magassag*scale, 0xFF, 0xFF, 0xFF, 0xFF);
 
 
-    Toltes t;                   ///Statikus Próbatöltés 1
-    t.q = 6 * scale;
-    t.vx = 0 * scale;
-    t.vy =0 * scale;
-    t.x = 500 * scale;
-    t.y = 500 * scale;
-    t.hatotav = 150 * scale;
-
-    Toltes t2;                  /// Statikus Próbatöltés 2
-    t2.q = -5 * scale;
-    t2.vx = 0 * scale;
-    t2.vy =0 * scale;
-    t2.x = 1150 * scale;
-    t2.y = 400 * scale;
-    t2.hatotav = 150 * scale;
-
-
-    filledCircleRGBA(renderer, t.x, t.y, GOLYO_R * scale, 60, 178, 226, 255); // csak a töltés helyére egy kör
-    filledCircleRGBA(renderer, t2.x, t2.y, GOLYO_R * scale, 60, 178, 226, 255); // csak a töltés helyére egy kör
-
-
-    Toltes p;                  /// Mozgó Próbatöltés
-    p.x = 100 *scale;
-    p.y = 580 *scale;
-    p.vx = 3 * scale;
-    p.vy = 0 * scale;
-    p.q = 1;                   // Teljesen mindegy mekkora ettől nem függ
-
+    for ( int i = 0; i < number_of_maps; i++)               /// töltés adatok át scalelése NAGYON FONTOS
+    {
+        toltes_scale(&(c[palya-1].toltes[i]), scale);
+    }
 
 
     for (int i = 0; i<maps[palya-1].meret; i++)             ///Páyla kirajzolása
@@ -105,26 +99,39 @@ int main(int argc, char *argv[])
         char file_hely[200];
 
         calculate_path(file_hely, color, tile);
-        rajzol(&file_hely, scale, x, y);
+        rajzol(file_hely, scale, x, y);                // a file hely elöl kitöröltem egy & et
     }
 
-    for (int i = 0; i<c.meret; i++)             ///Töltések kirajzolása
+    for (int i = 1; i<c[palya-1].meret; i++)             ///Töltések kirajzolása
     {
-        int x = c.charge[i].x;
-        int y = c.charge[i].y;
+        int x = c[palya-1].toltes[i].x;                 // 5-6 sorral lejjebb komment
+        int y = c[palya-1].toltes[i].y;
         char toltes_hely[200];
-        //printf("%f",c.charge[i].q);
-        charge_calculate_path(toltes_hely, c.charge[i].q);
-        charge_rajzol(toltes_hely, scale, c.charge[i].x, c.charge[i].y);
-
-
+        charge_calculate_path(toltes_hely, c[palya-1].toltes[i].q);
+        charge_rajzol(toltes_hely, scale, c[palya-1].toltes[i].x, c[palya-1].toltes[i].y);
     }
-
-
 
     // varunk a kilepesre
     SDL_Event event;
     int tries = 0;
+    Toltes* px = &(c[palya-1].toltes[0]);                       /// 0. töltésre rámutat egy px pointer, csak a név miattt
+
+    /// Csinál egy "screenshotot a rendrerről, hogy egy textúrában legyen"
+    SDL_Surface* pScreenShot;
+    pScreenShot = SDL_CreateRGBSurface(0, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN) , 32, NULL, NULL, NULL, NULL);
+    if(pScreenShot)
+    {
+      SDL_RenderReadPixels(renderer, NULL, SDL_GetWindowPixelFormat(window), pScreenShot->pixels, pScreenShot->pitch);
+      SDL_SaveBMP(pScreenShot, "Screenshot.bmp");
+      palya_kep.kep = SDL_CreateTextureFromSurface(renderer, pScreenShot); /// majd később kell freezni (destory texture)
+      SDL_FreeSurface(pScreenShot);
+
+
+    }
+    // töröljük a képernyőt
+    boxRGBA(renderer, 0, 0, def_screen.szelesseg*scale, def_screen.magassag*scale, 0xFF, 0xFF, 0xFF, 0xFF);
+
+
     while (SDL_WaitEvent(&event) && event.type != SDL_QUIT)
     {
 
@@ -133,56 +140,42 @@ int main(int argc, char *argv[])
         //felhasznaloi esemeny: ilyeneket general az idozito fuggveny
         case SDL_USEREVENT:
             // kitoroljuk az elozo poziciojabol (nagyjabol)
-            //filledCircleRGBA(renderer, p.x, p.y, GOLYO_R*scale, 0xFF, 0xFF, 0xFF, 0xFF);
-            //filledCircleRGBA(renderer, t.x, t.y, GOLYO_R * scale, 60, 178, 226, 255);   // csak a töltés helyére egy kö
-            //filledCircleRGBA(renderer, t2.x, t2.y, GOLYO_R * scale, 60, 178, 226, 255); // csak a töltés helyére egy kör
-            for (int i = 0; i<c.meret; i++)             ///Töltések kirajzolása
-            {
-                int x = c.charge[i].x;
-                int y = c.charge[i].y;
-                char toltes_hely[200];
+            ///filledCircleRGBA(renderer, px->x, px->y, GOLYO_R*scale, 0xFF, 0xFF, 0xFF, 0xFF);
 
-                charge_calculate_path(toltes_hely, c.charge[i].q);
-                charge_rajzol(toltes_hely, scale, c.charge[i].x, c.charge[i].y);
-
-            }
-            // kiszamitjuk az uj helyet
-        if (in_hatotav(p, t, t.hatotav))
+        /// kiszamitjuk az uj helyet
+        for (int i = 1; i < c[palya-1].meret; i++)
         {
-                calc_dir(p, t, time);
+            Toltes* tx = &(c[palya-1].toltes[i]);                   /// i. töltésre rámutat egy tx pointer
+
+            if (in_hatotav(*px, *tx, tx->hatotav))
+            {
                 //printf("p.x: %f\n", p.x);
                 //printf("p.y: %f\n", p.y);
-                calc_v(&p, &t, time, scale);
+                calc_v(px, tx, time, scale);
+            }
         }
+            px->x += px->vx;
+            px->y += px->vy;
 
-            p.x += p.vx;
-            p.y += p.vy;
-
-        if (in_hatotav(p, t2, t2.hatotav))
-        {
-                //printf("p.x: %f\n", p.x);
-                //printf("p.y: %f\n", p.y);
-            calc_v(&p, &t2, time, scale);
-        }
-
-            p.x += p.vx;            //EZ MIND 2 szer hozzáadódott javítani kell
-            p.y += p.vy;            //!!!!!
+            px->x += px->vx;
+            px->y += px->vy;
 
 
-
-            //visszapattanás
-            if (p.x < GOLYO_R*scale || p.x > prog_screen.szelesseg-GOLYO_R*scale)
+            ///visszapattanás
+            if (px->x < GOLYO_R*scale || px->x > prog_screen.szelesseg-GOLYO_R*scale)
             {
 
-                p.vx *= -1;
-               // tries++;
+                px->vx *= -1;
             }
-            if (p.y < GOLYO_R*scale || p.y > prog_screen.magassag-GOLYO_R*scale)
-                p.vy *= -1;
-            // ujra kirajzolas, es mehet a kepernyore
-            filledCircleRGBA(renderer, p.x, p.y, GOLYO_R*scale, 3, 165, 136, 220);
+            if (px->y < GOLYO_R*scale || px->y > prog_screen.magassag-GOLYO_R*scale)
+                px->vy *= -1;
+
+            // ujra kirajzolas, es mehet a kepernyore  EZ JELENIK MEG
+            SDL_RenderCopy(renderer, palya_kep.kep, NULL, &palya_kep.meret);
+            filledCircleRGBA(renderer, px->x, px->y, GOLYO_R*scale, 3, 165, 136, 220);
 
             SDL_RenderPresent(renderer);
+
             if (tries == 3)
                 SDL_Quit();
             break;
@@ -193,11 +186,18 @@ int main(int argc, char *argv[])
         if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE)
         {
             SDL_RemoveTimer(id);
+            SDL_DestroyTexture(palya_kep.kep);
             SDL_Quit();
-
 
         }
     }
+
+    for (int i = 0; i < number_of_maps; i ++)           ///Felszabadítja a pályákat
+    {
+        free_Map(maps[i], maps[i].meret);
+    }
+
+    free_Charge(c, number_of_maps);                     ///Felszabadítja a töltéseket
 
 
 

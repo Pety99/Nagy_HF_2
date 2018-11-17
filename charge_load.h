@@ -16,15 +16,9 @@ Az elsõ sor mindig a kilõni kívát töltés adatait jelenti, a többi pedig a statik
 */
 ///
 
-typedef struct Charge
-{
-    Toltes* charge;
-    int meret;
-
-}Charge;
 
 bool toltes_foglal(Charge * c, int meret);
 void toltes_fill(Charge c, char* toltes_helye);
-void free_Charge(Charge c, int sor);
+void free_Charge(Charge *c, int number_of_maps);
 void load_charges(Charge *c, char *toltes_helye);
 #endif // CHARGE_LOAD_H_INCLUDED
