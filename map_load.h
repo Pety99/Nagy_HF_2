@@ -14,6 +14,7 @@ void fill(Map p, char* path);
 void free_Map(Map p, int sor);
 void load_map(Map *map, char *path);
 void load_maps(Map *map, char *path);
+void load_all_maps(Map* maps, int number_of_maps);
 
 int pick_map (int number_of_maps);
 char* pick_color();

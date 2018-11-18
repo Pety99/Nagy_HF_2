@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <windows.h>
 #include <stdbool.h>
+#include <string.h>
 
 #include "screen.h"
 #include "map_load.h"
@@ -49,16 +50,29 @@ void calc_v (Toltes *p, Toltes *t, int time, double scale)
     }
     if (p->q > 0) //Pozitív töltés, taszít
     {
-        p->vx += fx / p->q * time/200 * -1;  // a /200 az 5ms os main időzítőjében miatt van
-        p->vy += fy / p->q * time/200 * -1;
+        p->vx += fx / p->q * 0.01 * -1;  // a /200 az 5ms os main időzítőjében miatt van
+        p->vy += fy / p->q * 0.01 * -1;
     }
     else
     {
-        p->vx += fx / p->q * time/200;
-        p->vy += fy / p->q * time/200;
+        p->vx += fx / p->q * 0.01;
+        p->vy += fy / p->q * 0.01;
     }
 
      //printf("vx: %f\nvy: %f\n",p->vx,p->vy);
+}
+
+void recalc_v(Toltes *p, Toltes *uj, char * irany)
+{
+    Toltes p2;
+    double szog = atan(uj->vy / uj->vx);
+    if (strcmp(irany, "down") == 0)
+        szog += 0.02;
+    else if(strcmp(irany, "up") == 0)
+        szog -= 0.02;
+    uj->vx = p->vx* cos(szog);
+    uj->vy = p->vy* sin(szog);
+
 }
 
 

@@ -21,4 +21,5 @@ bool toltes_foglal(Charge * c, int meret);
 void toltes_fill(Charge c, char* toltes_helye);
 void free_Charge(Charge *c, int number_of_maps);
 void load_charges(Charge *c, char *toltes_helye);
+void load_all_charges(Charge* c, int number_of_maps);
 #endif // CHARGE_LOAD_H_INCLUDED

@@ -101,6 +101,16 @@ void load_maps(Map *map, char *path)
     map->meret = sor_max;
 }
 
+void load_all_maps(Map* maps, int number_of_maps)
+{
+    for (int i = 0; i < number_of_maps; i ++)           ///Betölti a pályákat
+    {
+        char path[200];
+        sprintf(path,  "Maps/Map_%d.txt", i+1);
+        load_maps(&maps[i], path);
+    }
+}
+
 
 // ezek más kategória függvényei
 
@@ -117,6 +127,7 @@ int pick_map (int number_of_maps)
 
  char* pick_color()
 {
+    srand(time(NULL));
     char* colors[4] = {"Blue", "Brown", "Green", "Yellow"};
 
     char * color;

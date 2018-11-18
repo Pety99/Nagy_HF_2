@@ -62,3 +62,13 @@ void load_charges(Charge *c, char *toltes_helye)
     c->meret = sor_max;
 }
 
+void load_all_charges(Charge* c, int number_of_maps)
+{
+    for ( int i = 0; i < number_of_maps; i++)                           ///meghívásnál: c[palya].toltes[töltés szám].tulajdonság ( a palya egy int)
+    {                                                                   ///pl: c[1].toltes[2].hatotav
+        char toltes_helye[200];
+        sprintf(toltes_helye, "Maps/Charges/Charge_%d.txt", i+1);
+        load_charges(&c[i], toltes_helye);
+    }
+}
+
