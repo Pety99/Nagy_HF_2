@@ -33,10 +33,10 @@ void charge_rajzol(char const *path, double scale, int x, int y)
     int height = surface ->h;
     SDL_FreeSurface(surface);
     SDL_Rect destination;
-    destination.x = x - width/2;
-    destination.y = y - height/2;
     destination.h = (int)height * scale ;
     destination.w = (int)width * scale ;
+    destination.x = x - width/2;
+    destination.y = y - height*scale/2;
     destination.x = (int)destination.x;
     destination.y = (int)destination.y;
 

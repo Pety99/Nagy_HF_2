@@ -17,6 +17,14 @@
 #include "charge_draw.h"
 #include "screenshot.h"
 
+Uint32 idozit(Uint32 ms, void *param)
+{
+    SDL_Event ev;
+    ev.type = SDL_USEREVENT;
+    SDL_PushEvent(&ev);
+    return ms;   /* ujabb varakozas */
+}
+
 void mozgas(Charge* c, Toltes* px, int palya, int time, double scale)
 {
     for (int i = 1; i < c[palya-1].meret; i++)
@@ -40,13 +48,13 @@ void mozgas(Charge* c, Toltes* px, int palya, int time, double scale)
 
 char** background_foglal()
 {
-    char** backgrounds = (double**) malloc(8 * sizeof(char*));
+    char** backgrounds = (char**) malloc(8 * sizeof(char*));
     for (int y = 0; y < 8; ++y)
     backgrounds[y] = (char*) malloc(200 * sizeof(char));
     return backgrounds;
 }
 
-void visszapattanas(Charge* c, Toltes* px, int palya, int time, double scale, int GOLYO_R, Keprenyo prog_screen)
+void visszapattanas(Charge* c, Toltes* px, int palya, double scale, int GOLYO_R, Keprenyo prog_screen)
 {
     if (px->x < GOLYO_R*scale || px->x > prog_screen.szelesseg-GOLYO_R*scale)
             {
@@ -57,22 +65,127 @@ void visszapattanas(Charge* c, Toltes* px, int palya, int time, double scale, in
                 px->vy *= -1;
 }
 
+bool tavozas(Toltes* px, double scale, int GOLYO_R, Keprenyo prog_screen)
+{
+    bool crash = false;
+    if (px->x < -2*GOLYO_R*scale || px->x > prog_screen.szelesseg+2*GOLYO_R*scale)
+            {
+                Sleep(500);
+                crash = true;
+            }
+            if (px->y < -2*GOLYO_R*scale || px->y > prog_screen.magassag+2*GOLYO_R*scale)
+                {
+                Sleep(500);
+                crash = true;
+                }
+
+    return crash;
+}
+
+
 void draw_aim(SDL_Window **window, Toltes* mozgo, double scale)
 {
-    auto renderer = SDL_GetRenderer(*window);
+    SDL_Renderer* renderer = SDL_GetRenderer(*window);
     double szog = atan(mozgo->vy / mozgo->vx);
     int x = mozgo->x + (int)(mozgo->vx*cos(szog)* 30 * scale);
     int y = mozgo->y + (int)(mozgo->vy*cos(szog)* 30 * scale);
     thickLineRGBA (renderer, (int)mozgo->x, (int)mozgo->y, x, y, 4,3, 165, 136, 220);
 }
 
-Uint32 idozit(Uint32 ms, void *param)
+
+
+void jatek(Charge* c, Toltes* px, int palya, double scale, Keprenyo prog_screen, SDL_Window* window, Palya_screeshot palya_kep)
 {
-    SDL_Event ev;
-    ev.type = SDL_USEREVENT;
-    SDL_PushEvent(&ev);
-    return ms;   /* ujabb varakozas */
+
+    int time = 8;
+    SDL_TimerID id = SDL_AddTimer(time, idozit, NULL);
+    SDL_Renderer* renderer = SDL_GetRenderer(window);
+    enum { GOLYO_R=10 };
+    bool kiloves = false;
+    bool aim = false;
+    bool crash = false;
+    Toltes mozgo = *px;         /// Ezt a töltést fogjuk kirajzolni
+
+    // varunk a kilepesre
+    SDL_Event event;
+    while (SDL_WaitEvent(&event) && event.type != SDL_QUIT)
+    {
+        switch (event.type)
+        {
+        // Felhasznaloi esemeny: ilyeneket general az idozito fuggveny
+
+        case SDL_KEYDOWN:
+            switch (event.key.keysym.sym)
+            {
+            case SDLK_SPACE:
+                kiloves = true;
+                aim = false;
+                break;
+            case SDLK_UP:
+                recalc_v(px, &mozgo, "up");
+                aim = true;
+                break;
+            case SDLK_DOWN:
+                recalc_v(px, &mozgo, "down");
+                aim = true;
+                break;
+            case SDLK_r:
+                reset(px, &mozgo);
+                aim = true;
+                kiloves = false;
+                break;
+            }
+            break;
+
+
+        case SDL_USEREVENT:
+            // kitoroljuk az elozo poziciojabol (nagyjabol)
+            ///filledCircleRGBA(renderer, px->x, px->y, GOLYO_R*scale, 0xFF, 0xFF, 0xFF, 0xFF);
+
+            // kiszamitjuk a golyó uj helyét
+            if (kiloves)
+            {
+                mozgas(c, &mozgo, palya, time, scale);
+            }
+
+            //visszapattanás
+            //visszapattanas(c, &mozgo, palya, scale, GOLYO_R, prog_screen);
+            crash = tavozas(&mozgo, scale, GOLYO_R, prog_screen);
+            if (crash)
+            {
+                reset(px, &mozgo);
+                aim = true;
+                kiloves = false;
+                crash = false;
+            }
+
+            // ujra kirajzolas, es mehet a kepernyore  EZ JELENIK MEG
+            SDL_RenderCopy(renderer, palya_kep.kep, NULL, &palya_kep.meret);
+            filledCircleRGBA(renderer, mozgo.x, mozgo.y, GOLYO_R*scale, 3, 165, 136, 220);
+            if (aim)
+                draw_aim(&window, &mozgo, scale);
+            // Kirajzolunk mindent
+            SDL_RenderPresent(renderer);
+            break;
+
+        }
+        if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE)
+        {
+            //SDL_RemoveTimer(id);
+            SDL_DestroyTexture(palya_kep.kep);
+            SDL_Quit();
+
+        }
+    }
 }
+
+
+bool scaled(Toltes* p)
+{
+    return p->scaled;
+}
+
+
 
 int main(int argc, char *argv[])
 {
@@ -103,8 +216,8 @@ int main(int argc, char *argv[])
     SDL_Window *window;
     SDL_Renderer *renderer;
     Keprenyo prog_screen = sdl_init(&window, &renderer); //Szeretnem fuggvenybe tenni, de nem megy.
-    int time = 8;
-    SDL_TimerID id = SDL_AddTimer(time, idozit, NULL);
+    //int time = 8;
+    //SDL_TimerID id = SDL_AddTimer(time, idozit, NULL);
 
     //A rajzolasnal barmilyen ertek kirajzolhato a def_screen es a scale segitsegevel.
 
@@ -116,9 +229,15 @@ int main(int argc, char *argv[])
         background_rajzol1(background_path, scale, prog_screen, i);
     }
 
-    for ( int i = 0; i < number_of_maps; i++)               /// töltés adatok át scalelése NAGYON FONTOS
+
+
+    for ( int i = 0; i < c[palya-1].meret; i++)               /// töltés adatok át scalelése NAGYON FONTOS
     {
-        toltes_scale(&(c[palya-1].toltes[i]), scale);
+        if (!scaled(&(c[palya-1].toltes[i])))                 /// ha már volt scalelve és mégegyszer megyönk nem scaeli ujra
+        {
+            toltes_scale(&(c[palya-1].toltes[i]), scale);
+            c[palya-1].toltes[i].scaled = true;
+        }
     }
 
 
@@ -145,18 +264,17 @@ int main(int argc, char *argv[])
         bubble_rajzol(bubble_hely, scale, c[palya-1].toltes[i].x, c[palya-1].toltes[i].y, c[palya-1].toltes[i].hatotav);
     }
 
-
-    // varunk a kilepesre
-    SDL_Event event;
-    Toltes* px = &(c[palya-1].toltes[0]);                       /// 0. töltésre rámutat egy px pointer, csak a név miattt
-
     /// Csinál egy "screenshotot" a rendrerről, hogy egy textúrában legyen az egész pálya
     screenshot(&window, &palya_kep, scale);
-
+    Toltes* px = &(c[palya-1].toltes[0]);
+    jatek(c, px, palya, scale, prog_screen, window, palya_kep);
+/*
     bool kiloves = false;
     bool aim = false;
-    Toltes mozgo = c[palya-1].toltes[0];                        /// Ezt a töltést fogjuk kirajzolni
-
+    Toltes* px = &(c[palya-1].toltes[0]);       /// 0. töltésre rámutat egy px pointer, csak a név miattt
+    Toltes mozgo = *px;                        /// Ezt a töltést fogjuk kirajzolni
+    // varunk a kilepesre
+    SDL_Event event;
     while (SDL_WaitEvent(&event) && event.type != SDL_QUIT)
     {
         switch (event.type)
@@ -168,6 +286,7 @@ int main(int argc, char *argv[])
                     case SDLK_SPACE: kiloves = true; aim = false; break;
                     case SDLK_UP: recalc_v(px, &mozgo, "up"); aim = true; break;
                     case SDLK_DOWN: recalc_v(px, &mozgo, "down"); aim = true; break;
+                    case SDLK_r: reset(px, &mozgo); aim = true; kiloves = false; break;
                 }
                 break;
 
@@ -186,7 +305,7 @@ int main(int argc, char *argv[])
             visszapattanas(c, &mozgo, palya, time, scale, GOLYO_R, prog_screen);
 
             // ujra kirajzolas, es mehet a kepernyore  EZ JELENIK MEG
-            SDL_RenderCopy(renderer, palya_kep.kep, NULL, &palya_kep.meret);
+            SDL_RenderCopy(renderer, background, NULL, &palya_kep.meret);
             filledCircleRGBA(renderer, mozgo.x, mozgo.y, GOLYO_R*scale, 3, 165, 136, 220);
             if (aim)
                 draw_aim(&window, &mozgo, scale);
@@ -206,6 +325,7 @@ int main(int argc, char *argv[])
 
         }
     }
+            */
     runs ++;
     }
 

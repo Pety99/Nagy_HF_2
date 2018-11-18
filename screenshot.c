@@ -3,6 +3,7 @@
 #include <windows.h>
 
 #include "screenshot.h"
+#include "screen.h"
 
 void fill_palya_kep(Palya_screeshot* palya_kep)
 {
@@ -31,4 +32,5 @@ void screenshot(SDL_Window **window, Palya_screeshot *palya_kep, double scale)
     }
 
 }
+
 

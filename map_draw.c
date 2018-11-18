@@ -73,7 +73,6 @@ void background_rajzol1(char const **path, double scale, Keprenyo prog_screen, i
     SDL_Renderer *renderer;
 
 
-        printf("%s",path);
         SDL_Surface* surface = IMG_Load(path[i]);
         if (!surface)
         {
@@ -93,10 +92,3 @@ void background_rajzol1(char const **path, double scale, Keprenyo prog_screen, i
 
 }
 
-void all_rajzol(char const **path, double scale, Keprenyo prog_screen)
-{
-    for (int i = 0; i < 4; i ++)
-    {
-        background_rajzol1(path, scale, prog_screen, i);
-    }
-}

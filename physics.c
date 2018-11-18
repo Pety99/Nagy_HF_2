@@ -64,7 +64,6 @@ void calc_v (Toltes *p, Toltes *t, int time, double scale)
 
 void recalc_v(Toltes *p, Toltes *uj, char * irany)
 {
-    Toltes p2;
     double szog = atan(uj->vy / uj->vx);
     if (strcmp(irany, "down") == 0)
         szog += 0.02;
@@ -84,6 +83,14 @@ bool in_hatotav( Toltes p, Toltes t, double hatotav)
         return true;
     else
         return false;
+}
+
+void reset(Toltes *p, Toltes *uj)
+{
+    uj->vx = p->vx;
+    uj->vy = p->vy;
+    uj->x = p-> x;
+    uj->y = p-> y;
 }
 
 /*
