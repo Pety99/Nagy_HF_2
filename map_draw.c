@@ -1,4 +1,4 @@
-
+#include "debugmalloc.h"
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL2_gfxPrimitives.h>
@@ -70,9 +70,7 @@ int fill_backgrounds(char **backgrounds, char* color)
 
 void background_rajzol1(char const **path, double scale, Keprenyo prog_screen, int i)
 {
-    SDL_Renderer *renderer;
-
-
+        SDL_Renderer *renderer;
         SDL_Surface* surface = IMG_Load(path[i]);
         if (!surface)
         {

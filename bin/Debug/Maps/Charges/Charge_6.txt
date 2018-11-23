@@ -1,0 +1,9 @@
+1 50 415 3 3 0
+-8 600 415 0 0 75
+-10 900 415 0 0 175
+# Formatum: erosseg, 
+	    x koordinata,
+	    y koordinata,
+	    x iranyu sebesseg,
+	    y iranyu sebesseg,
+	    hatotav

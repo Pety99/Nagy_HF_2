@@ -1,4 +1,4 @@
-
+#include "debugmalloc.h"
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL2_gfxPrimitives.h>
@@ -55,8 +55,8 @@ void calc_v (Toltes *p, Toltes *t, int time, double scale)
     }
     else
     {
-        p->vx += fx / p->q * 0.01;
-        p->vy += fy / p->q * 0.01;
+       // p->vx += fx / p->q * 0.01;
+       // p->vy += fy / p->q * 0.01;
     }
 
      //printf("vx: %f\nvy: %f\n",p->vx,p->vy);

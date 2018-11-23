@@ -58,6 +58,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="debugmalloc.h" />
+		<Unit filename="load_results.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="load_results.h" />
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>

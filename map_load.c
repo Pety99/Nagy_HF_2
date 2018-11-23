@@ -1,5 +1,4 @@
 
-
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -121,6 +120,9 @@ int pick_map (int number_of_maps)
     {
         printf("Valassz palyat 1 - %d: ", number_of_maps);
         scanf("%d",&palya);
+
+        if (palya == -1)
+            break;
     }
     return palya;
  }

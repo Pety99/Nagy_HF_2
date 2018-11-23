@@ -1,3 +1,5 @@
+#include "debugmalloc.h"
+
 #include <SDL2/SDL.h>
 #include <SDL_image.h>
 #include <windows.h>

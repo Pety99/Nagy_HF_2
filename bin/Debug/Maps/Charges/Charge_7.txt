@@ -1,0 +1,10 @@
+1 50 415 3 3 0
+-10 660 415 3 3 130
+10 660 161 3 3 130
+10 660 670 3 3 130
+# Formatum: erosseg, 
+	    x koordinata,
+	    y koordinata,
+	    x iranyu sebesseg,
+	    y iranyu sebesseg,
+	    hatotav

@@ -1,4 +1,5 @@
 
+#include "debugmalloc.h"
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL2_gfxPrimitives.h>
@@ -16,6 +17,7 @@
 #include "charge_load.h"
 #include "charge_draw.h"
 #include "screenshot.h"
+#include "load_results.h"
 
 Uint32 idozit(Uint32 ms, void *param)
 {
@@ -54,7 +56,15 @@ char** background_foglal()
     return backgrounds;
 }
 
-void visszapattanas(Charge* c, Toltes* px, int palya, double scale, int GOLYO_R, Keprenyo prog_screen)
+void background_free(char** background_path)
+{
+    int i;
+    for(i = 0 ; i < 8 ; i++)
+        free(background_path[i]);
+    free(background_path);
+}
+
+void visszapattanas(Charge* c, Toltes* px, int palya, double scale, int GOLYO_R, Keprenyo prog_screen) ///NINCS HASZNÁLVA
 {
     if (px->x < GOLYO_R*scale || px->x > prog_screen.szelesseg-GOLYO_R*scale)
             {
@@ -92,15 +102,34 @@ void draw_aim(SDL_Window **window, Toltes* mozgo, double scale)
     thickLineRGBA (renderer, (int)mozgo->x, (int)mozgo->y, x, y, 4,3, 165, 136, 220);
 }
 
-
-
-void jatek(Charge* c, Toltes* px, int palya, double scale, Keprenyo prog_screen, SDL_Window* window, Palya_screeshot palya_kep)
+bool cel(Toltes* px, int palya, Map* maps, double scale, int sugar)
 {
+    if (px->x > maps[palya-1].map[0][1] *64 *scale && px->x < (maps[palya-1].map[0][1] + 1) *64 *scale)
+        if (px->y > maps[palya-1].map[0][2] *64 *scale && px->y < (maps[palya-1].map[0][2] + 1) *64 *scale)
+        {
+            Sleep(500);
+            /// WIN SCREEN KIRAJZOLÁSA ESETLEG
+            return true;
+        }
+    return false;
 
+}
+
+int calc_score(int tries)
+{
+        /*Ez a függvény e,őször csökken utánna nő és egyre nyújtottabb intevallumokon ismétli ezt
+        Az függvény érték 20000 - 6000 között vannak*/
+        return (int)(((pow(2,sin(sqrt((tries/3)+2)))) + 0.1 ) *10000);
+}
+
+void jatek(Charge* c, Toltes* px, int palya, double scale, Keprenyo prog_screen, SDL_Window* window, Palya_screeshot palya_kep, Map* maps, Result *user)
+{
+    int tries = 0;
     int time = 8;
     SDL_TimerID id = SDL_AddTimer(time, idozit, NULL);
     SDL_Renderer* renderer = SDL_GetRenderer(window);
     enum { GOLYO_R=10 };
+    bool win = false;
     bool kiloves = false;
     bool aim = false;
     bool crash = false;
@@ -131,6 +160,7 @@ void jatek(Charge* c, Toltes* px, int palya, double scale, Keprenyo prog_screen,
                 break;
             case SDLK_r:
                 reset(px, &mozgo);
+                tries ++;
                 aim = true;
                 kiloves = false;
                 break;
@@ -147,13 +177,17 @@ void jatek(Charge* c, Toltes* px, int palya, double scale, Keprenyo prog_screen,
             {
                 mozgas(c, &mozgo, palya, time, scale);
             }
+            win = cel(&mozgo, palya, maps, scale, GOLYO_R);
 
             //visszapattanás
             //visszapattanas(c, &mozgo, palya, scale, GOLYO_R, prog_screen);
+
+            check_crash2(c, &mozgo, maps, palya, scale, GOLYO_R);
             crash = tavozas(&mozgo, scale, GOLYO_R, prog_screen);
             if (crash)
             {
                 reset(px, &mozgo);
+                tries ++;
                 aim = true;
                 kiloves = false;
                 crash = false;
@@ -171,26 +205,102 @@ void jatek(Charge* c, Toltes* px, int palya, double scale, Keprenyo prog_screen,
         }
         if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE)
         {
-            //SDL_RemoveTimer(id);
+            SDL_RemoveTimer(id);
+            printf("Pontszam: %d\n", user->pontszam);
             SDL_DestroyTexture(palya_kep.kep);
+            SDL_DestroyWindow(window);
             SDL_Quit();
-
         }
+        if (win)
+            {
+                win = false;
+                user->pontszam += calc_score(tries);
+                user->palya += 1;
+                printf("Pontszam: %d\n", user->pontszam);
+
+                SDL_DestroyTexture(palya_kep.kep);
+                SDL_DestroyWindow(window);
+                SDL_Quit();
+
+            }
     }
 }
-
-
 bool scaled(Toltes* p)
 {
     return p->scaled;
 }
 
+void check_crash2(Charge* c, Toltes* mozgo, Map* maps, int palya, double scale, int sugar)
+{
+    for (int i = 1; i< maps[palya-1].meret; i++)
+    {
+        int tx = maps[palya-1].map[i][1]; // egy tile felső sarkának x koordinátája, még nem pixelekben.
+        int ty = maps[palya-1].map[i][2]; // ... alsó...
+
+        if (mozgo->x +sugar > tx*64*scale && mozgo->x -sugar< (tx+1)*64*scale)               /// Fontről - Lentről ütközés
+        {
+            /// ((fent-1pixel) > p < (fent+1pixel) vagy (lent-1pixel) > p < (lent+1pixel))
+            if (mozgo->y +sugar >= ty*64*scale -5 && mozgo->y +sugar <= ty*64*scale +5 || mozgo->y -sugar >= (ty+1)*64*scale -5 && mozgo->y -sugar <= (ty+1)*64*scale +5)
+                mozgo->vy *= -1;
+        }
+
+        if (mozgo->y +sugar> ty*64*scale && mozgo->y -sugar < (ty+1)*64*scale)              /// JObbrol - Balról ütközik
+        {
+            /// ((bal-1pixel) > p < bal+1pixel) vagy (jobb-1pixel) > p < (jobb+1pixel))
+            if (mozgo->x +sugar >= tx*64*scale -5 && mozgo->x +sugar <= tx*64*scale +5 || mozgo->x -sugar >= (tx+1)*64*scale -5 &&mozgo->x -sugar <= (tx+1)*64*scale +5)
+                mozgo->vx *= -1;
+        }
+    }
+}
+
+
+Result * jatekos(Result* eredmenyek)                /// Ellenőrzi, hogy az általunk megadott felhasználónév létezik e, ha nem csinál egyet
+{
+    printf("Nev: ");
+    char nev[20+1];
+    scanf("%s", &nev);
+    Result *mozgo;
+    for (mozgo = eredmenyek; mozgo != NULL; mozgo = mozgo->kov)
+    {
+        if ( strcmp((mozgo->nev), nev) == 0)
+        {
+            printf("Letezo felhasznalo\n");
+            return mozgo;
+        }
+    }
+    // Ha még nem létezik a felhasználó, csinál egyet
+    Result *uj = (Result *)malloc(sizeof(Result));
+    strcpy(uj->nev, nev);
+    uj->pontszam = 0;
+    uj->palya = 1;
+    return uj;
+}
+
+void free_user(Result *user, Result *eredmenyek)
+{
+    bool new_usr = true;
+    Result *mozgo;
+    for (mozgo = eredmenyek; mozgo != NULL; mozgo = mozgo->kov)
+    {
+        if ( strcmp((mozgo->nev), (user->nev)) == 0)
+        {
+            new_usr = false;
+        }
+    }
+    if (new_usr)
+        free(user);
+}
 
 
 int main(int argc, char *argv[])
 {
+    calc_score(10);
+    Result* eredmenyek;
+    eredmenyek = load_Results(eredmenyek,"Results.txt");     ///Betölti az eredményeket  MAJD FREEZNI KELL
+    Result*user = jatekos(eredmenyek);                       /// A jelenlegi játékos adatai
+
     int runs = 0;
-    int number_of_maps = 3;
+    int number_of_maps = 8;
                                                 /// A pályák számát majd át kell állítani annyire amennyi van!
     Map maps[number_of_maps];
     load_all_maps(maps, number_of_maps);        ///Betölti a pályákat
@@ -201,16 +311,17 @@ int main(int argc, char *argv[])
     enum { GOLYO_R=10 };
 
 
-    Palya_screeshot palya_kep;                  /// majd ez fogja tárolni a pályát
+    Palya_screeshot palya_kep;                  /// majd ez fogja tárolni a háttereket
     fill_palya_kep(&palya_kep);
 
-    while( runs < number_of_maps)
+    while(number_of_maps)                       ///mindig igaz
     {
-
-        int palya = pick_map(number_of_maps);       // Kiválasszuk a pályánk számát.
+        int palya = pick_map(user->palya);       // Kiválasszuk a pályánk számát.
+        if (palya == -1)
+            break;
         char * color = pick_color();                // Random színű pálya
 
-        char** background_path = background_foglal();                       ///betölti a töltéseket, még FREE() zni kell
+        char** background_path = background_foglal();                       ///betölti a hátterekt, még FREE() 8db, mert max annyi háttér van
         int number_of_bgs = fill_backgrounds(background_path, color);
 
     SDL_Window *window;
@@ -267,7 +378,7 @@ int main(int argc, char *argv[])
     /// Csinál egy "screenshotot" a rendrerről, hogy egy textúrában legyen az egész pálya
     screenshot(&window, &palya_kep, scale);
     Toltes* px = &(c[palya-1].toltes[0]);
-    jatek(c, px, palya, scale, prog_screen, window, palya_kep);
+    jatek(c, px, palya, scale, prog_screen, window, palya_kep, maps, user);
 /*
     bool kiloves = false;
     bool aim = false;
@@ -326,22 +437,22 @@ int main(int argc, char *argv[])
         }
     }
             */
+    background_free(background_path);                   /// Felszabadítja a hátterket
     runs ++;
     }
+    store_results(eredmenyek, user, "Results.txt");
 
-
-/*
-
-    for (int i = 0; i < number_of_maps; i ++)           ///Felszabadítja a pályákat
+    for (int i = 0; i < number_of_maps; i ++)           /// Felszabadítja a pályákat
     {
         free_Map(maps[i], maps[i].meret);
     }
-
-    free_Charge(c, number_of_maps);                     ///Felszabadítja a töltéseket
-
-*/
+    free_Charge(c, number_of_maps);                     /// Felszabadítja a töltéseket
+    free_user(user, eredmenyek);                        /// Felszabadítja a usert
+    //free(user);
+    free_results(eredmenyek);                           /// Felszabadítja az eredményeket
 
     /* ablak bezarasa */
 
     return 0;
 }
+
