@@ -1,6 +1,5 @@
-1 100 760 3 3 0
--20 500 650 0 0 150
-60 550 225 0 0 127
+1 50 430 3 3 0
+-6 660 430 0 0 300
 # Formatum: erosseg, 
 	    x koordinata,
 	    y koordinata,

@@ -32,7 +32,6 @@ void screenshot(SDL_Window **window, Palya_screeshot *palya_kep, double scale)
         palya_kep->kep = SDL_CreateTextureFromSurface(renderer, screen_shot); /// majd késõbb kell freezni (destory texture)
         SDL_FreeSurface(screen_shot);
     }
-
 }
 
 

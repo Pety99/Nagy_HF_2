@@ -29,22 +29,13 @@ void calc_v (Toltes *p, Toltes *t, int time, double scale)
 {
 
     double szog = atan((p->y-t->y)/(p->x-t->x));
-    //szog = szog * 180 / 3.14;
-   // if (p->y > t->y )
-     //   szog *= -1;
-    //printf("SZOG: %f\n",szog* 180 / 3.14);
     double r = sqrt(pow((p->x-t->x),2) + pow((p->y-t->y),2));
     double k = 90; // ARÁNYOSÁGI TÉNYWZÕ
     double f = k*p->q*t->q/(r);                 //Lehet nem r*r lesz mert így szebb íveken megy, nem lesz túl nagy a gyorsulás
-    //printf("%f\n",f);
     double fx = f* cos(szog) * scale; //ax
     double fy = f* sin(szog) * scale; //ay
-    //printf("fx: %f\nfy: %f\n",fx,fy);
-    //printf("%f\n%f\n",fx,fy);
     if ( p->x > t->x)  // Töltéstől jobbra van a mozgó töltés
     {
-
-        //printf("P:X %f\n",p->x);
         fx *= -1;
         fy *= -1;
     }
@@ -58,8 +49,26 @@ void calc_v (Toltes *p, Toltes *t, int time, double scale)
        // p->vx += fx / p->q * 0.01;
        // p->vy += fy / p->q * 0.01;
     }
+}
 
-     //printf("vx: %f\nvy: %f\n",p->vx,p->vy);
+void mozgas(Charge* c, Toltes* px, int palya, int time, double scale)
+{
+    for (int i = 1; i < c[palya-1].meret; i++)
+                {
+                    Toltes* tx = &(c[palya-1].toltes[i]);           /// i. töltésre rámutat egy tx pointer
+
+                    if (in_hatotav(*px, *tx, tx->hatotav))
+                    {
+                        //printf("p.x: %f\n", p.x);
+                        //printf("p.y: %f\n", p.y);
+                        calc_v(px, tx, time, scale);
+                    }
+                }
+                px->x += px->vx;
+                px->y += px->vy;
+
+                px->x += px->vx;
+                px->y += px->vy;
 }
 
 void recalc_v(Toltes *p, Toltes *uj, char * irany)
@@ -73,8 +82,6 @@ void recalc_v(Toltes *p, Toltes *uj, char * irany)
     uj->vy = p->vy* sin(szog);
 
 }
-
-
 
 bool in_hatotav( Toltes p, Toltes t, double hatotav)
 {
@@ -93,16 +100,25 @@ void reset(Toltes *p, Toltes *uj)
     uj->y = p-> y;
 }
 
-/*
-bool in_hatotav2( Charge c, int palya double hatotav)
+void check_crash2(Charge* c, Toltes* mozgo, Map* maps, int palya, double scale, int sugar)
 {
-    for (int i = 1; i <meret; i++)
-        int px = c[palya].toltes[i].x;                      ///mozgó töltés x koord
-        int py = c[palya].toltes[i].y;                      ///mozgó töltés y koord
-        int tx = c[palya].toltes[0].x;                      ///álló töltés x koord
-        int ty = c[palya].toltes[0].y;                      ///álló töltés y koord
+    for (int i = 1; i< maps[palya-1].meret; i++)
     {
-        double r = sqrt(pow((px-tx),2) + pow((py-ty),2));
+        int tx = maps[palya-1].map[i][1]; // egy tile felső sarkának x koordinátája, még nem pixelekben.
+        int ty = maps[palya-1].map[i][2]; // ... alsó...
+
+        if (mozgo->x +sugar > tx*64*scale && mozgo->x -sugar< (tx+1)*64*scale)               /// Fontről - Lentről ütközés
+        {
+            /// ((fent-1pixel) > p < (fent+1pixel) vagy (lent-1pixel) > p < (lent+1pixel))
+            if (mozgo->y +sugar >= ty*64*scale -5 && mozgo->y +sugar <= ty*64*scale +5 || mozgo->y -sugar >= (ty+1)*64*scale -5 && mozgo->y -sugar <= (ty+1)*64*scale +5)
+                mozgo->vy *= -1;
+        }
+
+        if (mozgo->y +sugar> ty*64*scale && mozgo->y -sugar < (ty+1)*64*scale)              /// JObbrol - Balról ütközik
+        {
+            /// ((bal-1pixel) > p < bal+1pixel) vagy (jobb-1pixel) > p < (jobb+1pixel))
+            if (mozgo->x +sugar >= tx*64*scale -5 && mozgo->x +sugar <= tx*64*scale +5 || mozgo->x -sugar >= (tx+1)*64*scale -5 &&mozgo->x -sugar <= (tx+1)*64*scale +5)
+                mozgo->vx *= -1;
+        }
     }
 }
-*/

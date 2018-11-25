@@ -87,6 +87,6 @@ void background_rajzol1(char const **path, double scale, Keprenyo prog_screen, i
 
         SDL_RenderCopy(renderer, texture,NULL, &destination);
         SDL_DestroyTexture(texture);
-
 }
+
 

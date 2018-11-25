@@ -7,6 +7,7 @@ typedef struct Palya_screeshot
     SDL_Texture *kep;
 }Palya_screeshot;
 
+void fill_palya_kep(Palya_screeshot* palya_kep);
 void screenshot(SDL_Window **window, Palya_screeshot *palya_kep, double scale);
 
 

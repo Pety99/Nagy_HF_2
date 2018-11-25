@@ -19,11 +19,12 @@ typedef struct Toltes
 
 void toltes_scale(Toltes* p, double scale);
 void calc_v (Toltes *p, Toltes *t, int time, double scale);
+void mozgas(Charge* c, Toltes* px, int palya, int time, double scale);
 void recalc_v(Toltes *p, Toltes *uj, char* irany);
-void reset(Toltes *p, Toltes *uj);
 bool in_hatotav( Toltes p, Toltes t, double hatotav);
+void reset(Toltes *p, Toltes *uj);
+void check_crash2(Charge* c, Toltes* mozgo, Map* maps, int palya, double scale, int sugar);
 
-bool in_hatotav2( Charge c, double hatotav);
 
 
 

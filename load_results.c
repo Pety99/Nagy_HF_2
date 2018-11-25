@@ -11,25 +11,9 @@ void eredmeny_beolvas(FILE ** fp, char* path)
     *fp = fopen(path, "rt+");
     if (*fp == NULL)
     {
-        perror("Nem siker�lt megnyitni a filet");
+        perror("Nem sikerült megnyitni a filet");
         return;
     }
-}
-
-int nevek_szama(char * path)  ///HASZOINTALAN
-{
-    // FONTOS!!! Lennie kell m�g egy enternek a file v�g�n.
-    char c;
-    int nevek = 0;
-    FILE* fp;
-    beolvas(&fp, path);
-
-    for (c = getc(fp); c != 'EOF'; c = getc(fp))
-        if (c == '\n') // N�veli a c-t ha \n karaktert l�t
-            nevek = nevek + 1;
-
-    fclose(fp);
-    return nevek;
 }
 
 Result *beszur(Result *elso, int pontszam, int palya, char* nev)
@@ -48,7 +32,7 @@ Result *beszur(Result *elso, int pontszam, int palya, char* nev)
     {
         Result *mozgo;
         Result *lemarado;
-        for (mozgo = elso; mozgo->kov != NULL && mozgo->pontszam >= pontszam; mozgo = mozgo->kov)  /// a mozgo ->kov  el�l lehet nem jo
+        for (mozgo = elso; mozgo->kov != NULL && mozgo->pontszam >= pontszam; mozgo = mozgo->kov)  /// a mozgo ->kov  elöl lehet nem jo
             lemarado = mozgo;
         uj->kov = mozgo;
         lemarado->kov = uj;
@@ -67,7 +51,8 @@ void free_results(Result *elso)
     }
 }
 
-void lista_kiir(Result *eleje) {
+void lista_kiir(Result *eleje)
+{
     Result *p;
     int i = 1;
     for (p = eleje; p->kov != NULL; p = p->kov)
@@ -92,9 +77,7 @@ Result* load_Results(Result* eredmenyek, char* path)
     int i = 0;
     while ((olvas = getline(&sor, &hossz, fp)) != -1)
     {
-        //printf("Retrieved sor of length %zu :\n", olvas);
-        //printf("%s", sor);
-    if (sor != "\n")
+    if (strcmp(sor, "\n") != 0)
     {
 
         sscanf(sor, "%s %d %d", &nev, &pontszam, &palya);
@@ -108,13 +91,13 @@ Result* load_Results(Result* eredmenyek, char* path)
 
 void store_results(Result *eredmeny, Result *user,  char*path)
 {
-    if (user->pontszam > 0)
+    if (user->pontszam > 0);
     {
-    beszur(eredmeny, user->pontszam, user->palya, user-> nev);
-    Result *futo;
-    for (futo = eredmeny; futo != NULL; futo = futo->kov) {
-        printf("%d", futo->palya);
+    if(is_new_user(user, eredmeny))
+    {
+        beszur(eredmeny, user->pontszam, user->palya, user-> nev);
     }
+    Result *futo;
 
     FILE *fp;
     eredmeny_beolvas(&fp, path);
@@ -126,3 +109,89 @@ void store_results(Result *eredmeny, Result *user,  char*path)
     fclose(fp);
     }
 }
+
+Result * jatekos(Result* eredmenyek)                /// Ellenőrzi, hogy az általunk megadott felhasználónév létezik e, ha nem csinál egyet
+{
+    char nev[20+1];
+    char * c = &nev;
+    bool beker = true;
+    while(beker)
+    {
+        printf("Nev: (max 20 karakter) ");
+        scanf(" %[^\n]", &nev);
+
+        for (int i = 0; i < strlen(nev); i++)
+        {
+            if ( c[i] == ' ')
+            {
+                printf("Nem lehet space a nevben\n");
+                beker = true;
+                break;
+            }
+            beker = false;
+        }
+    }
+
+
+    Result *mozgo;
+    for (mozgo = eredmenyek; mozgo != NULL; mozgo = mozgo->kov)
+    {
+        if ( strcmp((mozgo->nev), nev) == 0)
+        {
+            printf("Letezo felhasznalo\n");
+            return mozgo;
+        }
+    }
+    // Ha még nem létezik a felhasználó, csinál egyet
+    Result *uj = (Result *)malloc(sizeof(Result));
+    strcpy(uj->nev, nev);
+    uj->pontszam = 0;
+    uj->palya = 1;
+    return uj;
+}
+
+
+bool is_new_user(Result *user, Result *eredmenyek)
+{
+    bool new_usr = true;
+    Result *mozgo;
+    for (mozgo = eredmenyek; mozgo != NULL; mozgo = mozgo->kov)
+    {
+        if ( strcmp((mozgo->nev), (user->nev)) == 0)
+        {
+            new_usr = false;
+            break;
+        }
+    }
+    return new_usr;
+}
+
+void free_user(Result *user, Result *eredmenyek)
+{
+    bool new_usr = true;
+    Result *mozgo;
+    for (mozgo = eredmenyek; mozgo != NULL; mozgo = mozgo->kov)
+    {
+        if ( strcmp((mozgo->nev), (user->nev)) == 0)
+        {
+            new_usr = false;
+            //break;
+        }
+    }
+    if (new_usr && user->pontszam != 0);
+        free(user);
+}
+
+void print_results(Result* eredmenyek)
+{
+    Result *mozgo;
+    int i = 1;
+    printf("Eredmenyek\n\n");
+    for (mozgo = eredmenyek; mozgo->kov != NULL; mozgo = mozgo->kov)
+    {
+        printf("%d. %-20s pontszam: %-10d feloldott palyak: %d\n", i,  mozgo->nev, mozgo->pontszam, mozgo->palya);
+        i++;
+    }
+}
+
+

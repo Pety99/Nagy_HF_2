@@ -110,22 +110,57 @@ void load_all_maps(Map* maps, int number_of_maps)
     }
 }
 
+char** background_foglal()
+{
+    char** backgrounds = (char**) malloc(8 * sizeof(char*));
+    for (int y = 0; y < 8; ++y)
+    backgrounds[y] = (char*) malloc(200 * sizeof(char));
+    return backgrounds;
+}
+
+void background_free(char** background_path)
+{
+    int i;
+    for(i = 0 ; i < 8 ; i++)
+        free(background_path[i]);
+    free(background_path);
+}
+
 
 // ezek más kategória függvényei
 
 int pick_map (int number_of_maps)
- {
-     int palya = -1;
-    while (palya < 1 || palya > number_of_maps)
+{
+    char palya[10];
+    int betu = -1;
+    bool beker = true;
+    while (beker && betu < 1 || beker > number_of_maps)
     {
-        printf("Valassz palyat 1 - %d: ", number_of_maps);
-        scanf("%d",&palya);
+        bool exit = true;
+        printf("(-1 a kilepeshez)\nValassz palyat 1 - %d: ", number_of_maps);
+        scanf("%s",&palya);
 
-        if (palya == -1)
-            break;
+        betu = atoi(&palya);
+        if (betu == 0)
+        {
+            printf("Ne betuket irj be...\n");
+            exit = false;
+            betu = -1;
+        }
+
+        if (betu > number_of_maps)
+        {
+             printf("Ez a palya nem elerheto\n");
+             exit = false;
+             betu = -1;
+        }
+
+
+        if (exit && (betu != 0 || betu == -1) )
+            beker = false;
     }
-    return palya;
- }
+    return betu;
+}
 
  char* pick_color()
 {
